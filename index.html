@@ -358,6 +358,7 @@ async function saveBlockReason(url, title, reason) {
   try {
     const { error } = await supabase.from('job_blacklist').upsert({
       url, reason: `Bloqueado: ${reason} — "${title.substring(0,100)}"`,
+      reason_type: 'blocked', processed: false,
       is_active: true, created_at: new Date().toISOString()
     }, { onConflict: 'url' });
     return !error;
