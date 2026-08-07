@@ -183,6 +183,9 @@ body{
 .btn-discard:hover{background:rgba(239,68,68,.1);box-shadow:0 4px 12px rgba(239,68,68,.1)}
 .btn-expire{color:#94a3b8;border-color:rgba(100,116,139,.2)}
 .btn-expire:hover{background:rgba(100,116,139,.1)}
+.btn-apply{color:#818cf8;border-color:rgba(129,140,248,.2)}
+.btn-apply:hover{background:rgba(129,140,248,.12);box-shadow:0 4px 16px rgba(129,140,248,.15)}
+.btn-apply.active{background:rgba(129,140,248,.18);color:#a5b4fc;border-color:rgba(129,140,248,.35);box-shadow:0 0 20px rgba(129,140,248,.1)}
 .btn-block{color:#fbbf24;border-color:rgba(251,191,36,.2)}
 .btn-block:hover{background:rgba(251,191,36,.12);box-shadow:0 4px 16px rgba(251,191,36,.15)}
 .btn-block.active{background:rgba(251,191,36,.18);color:#fcd34d;border-color:rgba(251,191,36,.35);box-shadow:0 0 20px rgba(251,191,36,.1)}
@@ -728,6 +731,7 @@ function ChartSection({ jobs }) {
 function QuickFilters({ filters, setFilters, jobs }) {
   const counts = {
     favorita: jobs.filter(j=>j._status==='favorita').length,
+    inscrito: jobs.filter(j=>j._status==='inscrito').length,
     descartada: jobs.filter(j=>j._status==='descartada').length,
     expirada: jobs.filter(j=>j._status==='expirada').length,
     todas: jobs.length,
@@ -1014,6 +1018,7 @@ function JobCard({ job, onRemove, idx }) {
             {expanded ? 'Menos detalhes' : 'Mais detalhes'}
           </button>
           <div className="flex gap-1.5 flex-wrap justify-end">
+            <button onClick={()=>handleAction('inscrito')} className={} aria-label={status==='inscrito'?'Inscrito':'Inscrever-se na vaga'}><SvgIcon d={ICONS.check} size={13}/> {status==='inscrito'?'Inscrito':'Inscrever'}</button>
             <button onClick={()=>handleAction('favorita')} className={`action-btn btn-fav ${status==='favorita'?'active':''}`} aria-label={status==='favorita'?'Remover dos favoritos':'Favoritar vaga'}><SvgIcon d={ICONS.star} size={13}/> Favoritar</button>
             <button onClick={()=>handleAction('block')} className="action-btn btn-block" aria-label="Bloquear vaga"><SvgIcon d={ICONS.shield} size={13}/> Bloquear</button>
             <button onClick={()=>handleAction('discard')} className="action-btn btn-discard" aria-label="Descartar vaga"><SvgIcon d={ICONS.trash} size={13}/> Descartar</button>
