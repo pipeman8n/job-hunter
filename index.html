@@ -940,6 +940,7 @@ function JobCard({ job, onRemove, idx }) {
   };
 
   const score = job.fit_score || 0;
+  if (!window._jh_debug) { window._jh_debug = true; console.log('JH job keys:', Object.keys(job).slice(0,15), 'id_vaga:', job.id_vaga); }
   const scColor = score >= 70 ? '#34d399' : score >= 40 ? '#FBBF24' : '#94a3b8';
   const scBg = score >= 70 ? 'rgba(16,185,129,.12)' : score >= 40 ? 'rgba(217,119,6,.12)' : 'rgba(100,116,139,.1)';
   const scBorder = score >= 70 ? 'rgba(16,185,129,.25)' : score >= 40 ? 'rgba(217,119,6,.2)' : 'rgba(100,116,139,.15)';
