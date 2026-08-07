@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": "2026-08-01T14:08:36.722364+00:00",
+    "action": "authorize",
+    "old_hash": "a44d546f4c787d4eda8a9ab6d2e42dca5f0fc54eb1543633ffce682ed54f7005",
+    "new_hash": "2edb6c6aa1d3c650c1b0651be6dd29547d8340e7bd7ca23b54e326648e286318"
+  },
+  {
+    "timestamp": "2026-08-01T14:12:51.954572+00:00",
+    "action": "authorize",
+    "old_hash": "2edb6c6aa1d3c650c1b0651be6dd29547d8340e7bd7ca23b54e326648e286318",
+    "new_hash": "adc24dd2eef310eaaf86f89f8c66d60096174b2bd53c627e5b2524934e6ee1a4"
+  },
+  {
+    "timestamp": "2026-08-01T14:26:59.593705+00:00",
+    "action": "authorize",
+    "old_hash": "adc24dd2eef310eaaf86f89f8c66d60096174b2bd53c627e5b2524934e6ee1a4",
+    "new_hash": "f94c22dd55ae713270b31303c4cc4cbb96c793abc935abcff533dac60d6b53fc"
+  },
+  {
+    "timestamp": "2026-08-01T14:49:53.775825+00:00",
+    "action": "authorize",
+    "old_hash": "f94c22dd55ae713270b31303c4cc4cbb96c793abc935abcff533dac60d6b53fc",
+    "new_hash": "b15ce14eea4822e1eb59956f16b5f8888d242db78e4f8ad9a51183a104772f05"
+  }
+]

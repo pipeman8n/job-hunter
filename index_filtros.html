@@ -183,12 +183,6 @@ body{
 .btn-discard:hover{background:rgba(239,68,68,.1);box-shadow:0 4px 12px rgba(239,68,68,.1)}
 .btn-expire{color:#94a3b8;border-color:rgba(100,116,139,.2)}
 .btn-expire:hover{background:rgba(100,116,139,.1)}
-.btn-apply{color:#818cf8;border-color:rgba(129,140,248,.2)}
-.btn-apply:hover{background:rgba(129,140,248,.12);box-shadow:0 4px 16px rgba(129,140,248,.15)}
-.btn-apply.active{background:rgba(129,140,248,.18);color:#a5b4fc;border-color:rgba(129,140,248,.35);box-shadow:0 0 20px rgba(129,140,248,.1)}
-.btn-block{color:#fbbf24;border-color:rgba(251,191,36,.2)}
-.btn-block:hover{background:rgba(251,191,36,.12);box-shadow:0 4px 16px rgba(251,191,36,.15)}
-.btn-block.active{background:rgba(251,191,36,.18);color:#fcd34d;border-color:rgba(251,191,36,.35);box-shadow:0 0 20px rgba(251,191,36,.1)}
 
 /* ── Modal ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(2,6,23,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadeIn .25s}
@@ -356,18 +350,6 @@ async function saveToSupabase(url, status, notes) {
   } catch { return false; }
 }
 
-async function saveBlockReason(url, title, reason) {
-  if (!supabase) return false;
-  try {
-    const { error } = await supabase.from('job_blacklist').upsert({
-      url, reason: `Bloqueado: ${reason} — "${title.substring(0,100)}"`,
-      reason_type: 'blocked', processed: false,
-      is_active: true, created_at: new Date().toISOString()
-    }, { onConflict: 'url' });
-    return !error;
-  } catch { return false; }
-}
-
 // ─── API ────────────────────────────────────────
 const API_BASE = '/api';
 async function apiCall(data) {
@@ -446,47 +428,6 @@ function ConfirmModal({ open, title, message, confirmLabel, confirmColor, iconD,
   );
 }
 
-function BlockModal({ open, job, onConfirm, onCancel }) {
-  const [reason, setReason] = React.useState('');
-  if (!open) return null;
-  return (
-    <div className="modal-overlay" onClick={onCancel} role="dialog" aria-modal="true">
-      <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth:'440px'}}>
-        <div className="flex items-start gap-4 mb-4">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-            style={{background:'rgba(251,191,36,.14)'}}>
-            <SvgIcon d={ICONS.shield} size={22} style={{color:'#fbbf24'}}/>
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-white mb-1" style={{fontFamily:'var(--font-sans)'}}>Bloquear vaga</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">Informe o motivo do bloqueio. O scraper usara isso para filtrar vagas similares.</p>
-          </div>
-        </div>
-        <textarea
-          value={reason}
-          onChange={e => setReason(e.target.value)}
-          placeholder="Ex: cargo fora do perfil BPM/automacao, consultoria, supply chain..."
-          className="w-full bg-white/[0.03] border border-gray-700/60 rounded-xl p-3 text-sm text-white placeholder-gray-600 resize-none focus:outline-none focus:border-accent/40 mb-4 font-sans"
-          rows={3}
-          autoFocus
-        />
-        <div className="flex gap-3 justify-end">
-          <button onClick={onCancel}
-            className="px-5 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white border border-gray-700/60 hover:border-gray-500 transition-colors duration-200 font-sans"
-            style={{background:'rgba(255,255,255,.02)',backdropFilter:'blur(6px)'}}>
-            Cancelar
-          </button>
-          <button onClick={() => { if (reason.trim()) { onConfirm(reason); setReason(''); } }}
-            disabled={!reason.trim()}
-            className={`px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition duration-200 font-sans ${reason.trim() ? 'bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-500/25' : 'bg-gray-700 cursor-not-allowed'}`}>
-            Bloquear
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Data Fetching ──────────────────────────────
 function extractLabel(row) {
   const stack = (row.stack || []).map(String);
@@ -531,34 +472,6 @@ async function fetchJobs() {
         if (/\bpo\b/i.test(t) && !t.includes('power') && !t.includes('platform')) return false;
         if (t.includes('product owner') && !t.includes('platform') && !t.includes('process')) return false;
         if (t.includes('gerente de projetos') || t.includes('project manager')) return false;
-        if (/consultor.*legal|legal\s*ops/i.test(t)) return false;
-        if (/analista\s+(de\s+)?produtos?\b/i.test(t)) return false;
-        if (/\bqa\b|quality\s+assurance/i.test(t)) return false;
-        if (/analista.*\bmarketing\b/i.test(t)) return false;
-        if (/\bdesign\b|ux|ui\b/i.test(t)) return false;
-        if (/coordenador\s+(de\s+)?vendas|inside\s*sales/i.test(t)) return false;
-        if (/\bdevops\b|sre\b|site\s*reliability/i.test(t)) return false;
-        if (/data\s*scientist|machine\s*learning/i.test(t)) return false;
-        if (/sap\s+(mm|sd|fi|co|pp|pm|hr|abap|basis)/i.test(t)) return false;
-        if (/assistente\s+(de\s+)?m[ií]dia/i.test(t)) return false;
-        if (/engenheir[oa].*inteligência\s*artificial/i.test(t)) return false;
-        if (/consultor\s+(de\s+)?implanta[çc][aã]o/i.test(t)) return false;
-        if (/\bj[uú]nior\b|\bjr\.?\b/i.test(t)) return false;
-        if (/analista\s+(de\s+)?qualidade/i.test(t)) return false;
-        if (/analista\s+(de\s+)?projetos/i.test(t)) return false;
-        if (/software\s*engineer|desenvolvedor|full\s*stack|backend|frontend/i.test(t) && !/automa[çc]|n8n|pipefy|low.code|rpa/i.test(t)) return false;
-        if (/\bpcd\b/i.test(t)) return false;
-        if (/\bsales\s*(ops|operations)\b|executivo\s+(de\s+)?contas|executivo\s+(de\s+)?vendas/i.test(t)) return false;
-        if (/analista\s+comercial|comercial\s+transportadora|vendedor|consultor\s+(de\s+)?vendas/i.test(t)) return false;
-        if (/log[íi]stic[oa]|supply\s*chain/i.test(t)) return false;
-        if (/compras|procurement|purchasing/i.test(t)) return false;
-        if (/operador\s+log[íi]stic/i.test(t)) return false;
-        if (/gerente\s+(de\s+)?agilidade|coach\s+([áa]gil|agil)|agile\s*coach|scrum\s*master/i.test(t)) return false;
-        if (/seguran[ça]\w*\s+(da\s+)?informa[çc][aã]o|security\s*engineer/i.test(t)) return false;
-        if (/deloitte|pwc\b|accenture|avanade|kpmg|ernst|ey\b/i.test(t)) return false;
-        if (/estoquista|almoxarif|expedi[çc][aã]o/i.test(t)) return false;
-        const loc = (row.location || '').toLowerCase();
-        if (loc && !/sp|s[aã]o paulo|remoto|home office|híbrido|hibrido|brasil|brazil/i.test(loc)) return false;
         return true;
       })
       .map(row => ({
@@ -784,6 +697,7 @@ function ChartSection({ jobs }) {
 function QuickFilters({ filters, setFilters, jobs }) {
   const counts = {
     favorita: jobs.filter(j=>j._status==='favorita').length,
+    entrevista: jobs.filter(j=>j._status==='entrevista').length,
     descartada: jobs.filter(j=>j._status==='descartada').length,
     expirada: jobs.filter(j=>j._status==='expirada').length,
     todas: jobs.length,
@@ -791,6 +705,7 @@ function QuickFilters({ filters, setFilters, jobs }) {
 
   const pills = [
     { label:'Favoritas', status:'favorita', count:counts.favorita, color:'rgba(245,158,11,.12)', textColor:'#fbbf24', iconD:ICONS.star },
+    { label:'Entrevista', status:'entrevista', count:counts.entrevista, color:'rgba(16,185,129,.12)', textColor:'#34d399', iconD:ICONS.interview },
     { label:'Descartadas', status:'descartada', count:counts.descartada, color:'rgba(239,68,68,.1)', textColor:'#f87171', iconD:ICONS.trash },
     { label:'Expiradas', status:'expirada', count:counts.expirada, color:'rgba(100,116,139,.1)', textColor:'#94a3b8', iconD:ICONS.clock },
     { label:'Todas', status:'', count:counts.todas, color:'rgba(30,64,175,.1)', textColor:'#60a5fa', iconD:ICONS.document },
@@ -876,7 +791,8 @@ function FilterBar({ jobs, filters, setFilters, searchRaw, setSearchRaw, visible
         <option value="">Todos status</option>
         <option value="pending">Pendentes</option>
         <option value="favorita">Favoritas</option>
-        <option value="inscrito">Inscritas</option>
+        <option value="enviada">Enviadas</option>
+        <option value="entrevista">Entrevista</option>
         <option value="descartada">Descartadas</option>
         <option value="expirada">Expiradas</option>
       </select>
@@ -900,11 +816,11 @@ function JobCard({ job, onRemove, idx }) {
   const staggerDelay = `${0.06 * (idx || 0)}s`;
 
   const handleAction = async (newStatus) => {
-    if (newStatus === 'discard' || newStatus === 'expire' || newStatus === 'block') {
+    if (newStatus === 'discard' || newStatus === 'expire') {
       setModal(newStatus);
       return;
     }
-    const target = (newStatus === 'favorita' && status === 'favorita') || (newStatus === 'inscrito' && status === 'inscrito') ? 'pending' : newStatus;
+    const target = newStatus === 'favorita' && status === 'favorita' ? 'pending' : newStatus;
     await applyStatus(target);
   };
 
@@ -925,8 +841,8 @@ function JobCard({ job, onRemove, idx }) {
     }
 
     const msgs = {
-      descartada:'Vaga removida', expirada:'Expirada', pending:'Restaurada',
-      inscrito:'Inscrito!'
+      favorita:'Favoritada!', enviada:'Enviada', entrevista:'Entrevista agendada!',
+      descartada:'Vaga removida', expirada:'Expirada', pending:'Restaurada'
     };
     addToast(msgs[newStatus]||'Atualizado', (newStatus==='descartada'||newStatus==='expirada')?'warning':'success');
 
@@ -947,7 +863,8 @@ function JobCard({ job, onRemove, idx }) {
   const isHybrid = wm.includes('híbr')||wm.includes('hybrid');
 
   const statusBadge = status==='favorita'?{label:'Favorita',cls:'bg-amber-500/12 text-amber-400 border-amber-500/18',iconD:ICONS.star}
-    :status==='inscrito'?{label:'Inscrito',cls:'bg-indigo-500/12 text-indigo-400 border-indigo-500/18',iconD:ICONS.check}
+    :status==='entrevista'?{label:'Entrevista',cls:'bg-emerald-500/12 text-emerald-400 border-emerald-500/18',iconD:ICONS.interview}
+    :status==='enviada'?{label:'Enviada',cls:'bg-blue-500/12 text-blue-400 border-blue-500/18',iconD:ICONS.send}
     :status==='descartada'?{label:'Descartada',cls:'bg-red-500/12 text-red-400 border-red-500/18',iconD:ICONS.trash}
     :status==='expirada'?{label:'Expirada',cls:'bg-slate-500/12 text-slate-400 border-slate-500/18',iconD:ICONS.clock}
     :null;
@@ -965,16 +882,6 @@ function JobCard({ job, onRemove, idx }) {
         message={`"${job.title?.substring(0,70)}…" sera marcada como expirada e removida.`}
         confirmLabel="Sim, expirar" confirmColor="danger" iconD={ICONS.clock}
         onConfirm={() => applyStatus('expirada')} onCancel={() => setModal(null)} />
-
-      <BlockModal open={modal==='block'} job={job}
-        onConfirm={async (reason) => {
-          await saveBlockReason(job.url, job.title, reason);
-          await saveToSupabase(job.url, 'blocked', `Motivo: ${reason}`);
-          addToast('Vaga bloqueada. Motivo registrado.', 'success');
-          setHiding(true);
-          setTimeout(() => onRemove(job.url), 350);
-        }}
-        onCancel={() => setModal(null)} />
 
       <div className={`glass-card p-5 ${hiding?'job-hidden':''}`}
         style={{animation: `cardStaggerIn .5s ${staggerDelay} var(--easing) both`}}>
@@ -1083,9 +990,9 @@ function JobCard({ job, onRemove, idx }) {
             {expanded ? 'Menos detalhes' : 'Mais detalhes'}
           </button>
           <div className="flex gap-1.5 flex-wrap justify-end">
-            <button onClick={()=>handleAction('inscrito')} className={`action-btn btn-apply ${status==='inscrito'?'active':''}`} aria-label={status==='inscrito'?'Inscrito':'Inscrever-se na vaga'}><SvgIcon d={ICONS.check} size={13}/> {status==='inscrito'?'Inscrito':'Inscrever'}</button>
             <button onClick={()=>handleAction('favorita')} className={`action-btn btn-fav ${status==='favorita'?'active':''}`} aria-label={status==='favorita'?'Remover dos favoritos':'Favoritar vaga'}><SvgIcon d={ICONS.star} size={13}/> Favoritar</button>
-            <button onClick={()=>handleAction('block')} className="action-btn btn-block" aria-label="Bloquear vaga"><SvgIcon d={ICONS.shield} size={13}/> Bloquear</button>
+            <button onClick={()=>handleAction('enviada')} className={`action-btn btn-send ${status==='enviada'?'active':''}`} aria-label="Marcar como enviada"><SvgIcon d={ICONS.send} size={13}/> Enviada</button>
+            <button onClick={()=>handleAction('entrevista')} className={`action-btn btn-interview ${status==='entrevista'?'active':''}`} aria-label="Agendar entrevista"><SvgIcon d={ICONS.interview} size={13}/> Entrevista</button>
             <button onClick={()=>handleAction('discard')} className="action-btn btn-discard" aria-label="Descartar vaga"><SvgIcon d={ICONS.trash} size={13}/> Descartar</button>
             <button onClick={()=>handleAction('expire')} className="action-btn btn-expire" aria-label="Marcar como expirada"><SvgIcon d={ICONS.clock} size={13}/> Expirar</button>
           </div>
@@ -1115,7 +1022,7 @@ function App() {
 
   const filtered = useMemo(() => {
     let r = [...jobs];
-    if (!filters.status) r = r.filter(j => (j._status||'pending')!=='descartada' && (j._status||'pending')!=='expirada' && (j._status||'pending')!=='inscrito');
+    if (!filters.status) r = r.filter(j => (j._status||'pending')!=='descartada' && (j._status||'pending')!=='expirada');
     if (filters.search) { const s = filters.search.toLowerCase(); r = r.filter(j => (j.title||'').toLowerCase().includes(s) || (j.company||'').toLowerCase().includes(s)); }
     if (filters.category) r = r.filter(j => j.query_label === filters.category);
     if (filters.model) r = r.filter(j => j.work_model === filters.model);
@@ -1155,7 +1062,7 @@ function App() {
           <div className="flex justify-center gap-6 mt-6 text-[11px] text-gray-600 font-medium font-mono">
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" style={{boxShadow:'0 0 6px #10b981'}}></span>
-              Front: v%%DEPLOY_VERSION%% — %%DEPLOY_TIME%%
+              Atualizado: {new Date().toLocaleString('pt-BR')}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-accent" style={{boxShadow:'0 0 6px #1E40AF'}}></span>
