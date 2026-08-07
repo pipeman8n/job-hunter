@@ -553,6 +553,7 @@ async function fetchJobs() {
         if (/log[íi]stic[oa]|supply\s*chain/i.test(t)) return false;
         if (/compras|procurement|purchasing/i.test(t)) return false;
         if (/operador\s+log[íi]stic/i.test(t)) return false;
+        if (/analista\s+(de\s+)?suporte|suporte\s+(t[ée]cnico|field|helpdesk|n1|n2|n3)/i.test(t)) return false;
         if (/gerente\s+(de\s+)?agilidade|coach\s+([áa]gil|agil)|agile\s*coach|scrum\s*master/i.test(t)) return false;
         if (/seguran[ça]\w*\s+(da\s+)?informa[çc][aã]o|security\s*engineer/i.test(t)) return false;
         if (/deloitte|pwc\b|accenture|avanade|kpmg|ernst|ey\b/i.test(t)) return false;
