@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Headhunter Preditivo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        midnight:  '#020617',
+        deep:     '#0E1223',
+        navy:     '#0E1223',
+        slate:    '#1A1E2F',
+        accent:   '#1E40AF',
+        'accent-glow': '#3B82F6',
+        success:  '#10b981',
+        warning:  '#f59e0b',
+        danger:   '#ef4444',
+        info:     '#3b82f6',
+        surface:  'rgba(14,18,35,0.65)',
+      }
+    }
+  }
+}
+const SUPABASE_URL = 'https://ylmwwwtnqhqjtufqmctf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2385xYLvKQNnLOkiJHta5w_GbJXz9VU';
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --font-sans: 'Fira Sans', 'Inter', system-ui, sans-serif;
+  --font-mono: 'Fira Code', 'Fira Sans', 'Inter', monospace;
+  --easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --bg: #020617;
+  --card: #0E1223;
+  --card-border: #334155;
+  --primary: #1E40AF;
+  --accent: #D97706;
+  --muted: #1A1E2F;
+  --muted-fg: #94A3B8;
+  --border: #334155;
+  --destructive: #EF4444;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  background:#020617;
+  min-height:100vh;
+  color:#F8FAFC;
+}
+
+/* ── Financial Dashboard Glass Surfaces ── */
+.glass{
+  background:rgba(14,18,35,.65);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(51,65,85,.35);
+}
+.glass-card{
+  background:rgba(14,18,35,.5);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(51,65,85,.25);
+  border-radius:16px;
+  transition:transform .2s var(--easing),box-shadow .2s var(--easing),border-color .2s var(--easing);
+  position:relative;overflow:hidden;
+  cursor:pointer;
+}
+.glass-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 32px rgba(30,64,175,.08),0 2px 8px rgba(0,0,0,.3);
+  border-color:rgba(30,64,175,.18);
+}
+
+/* ── Card stagger animation (GSAP-inspired) ── */
+@keyframes cardStaggerIn {
+  from { opacity:0; transform:scale(.92) translateY(16px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.card-stagger {
+  animation: cardStaggerIn .5s var(--easing) both;
+}
+
+/* ── KPI Cards — Bullet Chart Style ── */
+.kpi-card{
+  position:relative;overflow:hidden;
+  background:rgba(14,18,35,.55);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(51,65,85,.25);
+  border-radius:16px;padding:20px 22px;
+  transition:transform .2s var(--easing),box-shadow .2s var(--easing),border-color .2s var(--easing);
+  cursor:pointer;
+}
+.kpi-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(30,64,175,.08),0 2px 6px rgba(0,0,0,.25);
+  border-color:rgba(30,64,175,.2);
+}
+.kpi-card .kpi-bullet-bar{
+  height:6px;border-radius:4px;margin-top:14px;
+  background:rgba(51,65,85,.4);
+  position:relative;overflow:visible;
+}
+.kpi-card .kpi-bullet-fill{
+  height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--kpi-color,#1E40AF),var(--kpi-color-glow,#3B82F6));
+  transition:width .6s var(--easing);
+  max-width:100%;
+}
+.kpi-card .kpi-bullet-target{
+  position:absolute;top:-3px;width:3px;height:12px;border-radius:2px;
+  background:var(--kpi-target-color,#D97706);
+  transform:translateX(-50%);
+  box-shadow:0 0 6px var(--kpi-target-color,#D97706);
+}
+
+/* ── KPI Icon ── */
+.kpi-icon{
+  width:44px;height:44px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(51,65,85,.3);
+  transition:transform .2s var(--easing);
+  flex-shrink:0;
+}
+.kpi-card:hover .kpi-icon{transform:scale(1.06)}
+
+/* ── Glow Text ── */
+.glow-title{
+  background:linear-gradient(135deg,#60A5FA 0%,#1E40AF 40%,#93C5FD 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.glow-text{text-shadow:0 0 20px rgba(30,64,175,.3)}
+
+/* ── Badges ── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 11px;border-radius:9999px;font-size:11px;font-weight:600;
+  letter-spacing:.015em;white-space:nowrap;
+  font-family:var(--font-mono);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  cursor:default;
+}
+.badge-ai{background:linear-gradient(135deg,#1E40AF,#3B82F6);color:#fff;box-shadow:0 2px 10px rgba(30,64,175,.35)}
+.badge-score-high{background:rgba(16,185,129,.14);color:#34d399;border:1px solid rgba(16,185,129,.2)}
+.badge-score-mid{background:rgba(217,119,6,.12);color:#FBBF24;border:1px solid rgba(217,119,6,.15)}
+.badge-remote{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.15)}
+.badge-hybrid{background:rgba(217,119,6,.1);color:#fcd34d;border:1px solid rgba(217,119,6,.12)}
+
+/* ── Action Buttons ── */
+.action-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 15px;border-radius:10px;font-size:11.5px;font-weight:600;
+  cursor:pointer;transition:transform .2s var(--easing),box-shadow .2s var(--easing),background .2s var(--easing);
+  border:1px solid transparent;background:rgba(255,255,255,.02);
+  font-family:var(--font-sans);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.action-btn:hover{transform:translateY(-1.5px)}
+.action-btn:active{transform:scale(.95)}
+.action-btn:focus-visible{outline:2px solid #3B82F6;outline-offset:2px}
+.btn-fav{color:#f59e0b;border-color:rgba(245,158,11,.2)}
+.btn-fav:hover{background:rgba(245,158,11,.12);box-shadow:0 4px 16px rgba(245,158,11,.15)}
+.btn-fav.active{background:rgba(245,158,11,.18);color:#fbbf24;border-color:rgba(245,158,11,.35);box-shadow:0 0 20px rgba(245,158,11,.1)}
+.btn-send{color:#60a5fa;border-color:rgba(59,130,246,.2)}
+.btn-send:hover{background:rgba(59,130,246,.12);box-shadow:0 4px 16px rgba(59,130,246,.15)}
+.btn-send.active{background:rgba(59,130,246,.18);color:#93c5fd;border-color:rgba(59,130,246,.35);box-shadow:0 0 20px rgba(59,130,246,.1)}
+.btn-interview{color:#34d399;border-color:rgba(16,185,129,.2)}
+.btn-interview:hover{background:rgba(16,185,129,.12);box-shadow:0 4px 16px rgba(16,185,129,.15)}
+.btn-interview.active{background:rgba(16,185,129,.18);color:#6ee7b7;border-color:rgba(16,185,129,.35);box-shadow:0 0 20px rgba(16,185,129,.1)}
+.btn-discard{color:#f87171;border-color:rgba(239,68,68,.2)}
+.btn-discard:hover{background:rgba(239,68,68,.1);box-shadow:0 4px 12px rgba(239,68,68,.1)}
+.btn-expire{color:#94a3b8;border-color:rgba(100,116,139,.2)}
+.btn-expire:hover{background:rgba(100,116,139,.1)}
+.btn-block{color:#fbbf24;border-color:rgba(251,191,36,.2)}
+.btn-block:hover{background:rgba(251,191,36,.12);box-shadow:0 4px 16px rgba(251,191,36,.15)}
+.btn-block.active{background:rgba(251,191,36,.18);color:#fcd34d;border-color:rgba(251,191,36,.35);box-shadow:0 0 20px rgba(251,191,36,.1)}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(2,6,23,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadeIn .25s}
+.modal-box{
+  background:linear-gradient(160deg,#0E1223,#020617);
+  border:1px solid rgba(51,65,85,.35);
+  border-radius:18px;padding:30px;max-width:440px;width:92%;
+  box-shadow:0 28px 80px rgba(0,0,0,.65),0 0 0 1px rgba(30,64,175,.1);
+  animation:scaleIn .25s var(--easing);
+}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;top:24px;right:24px;z-index:2000;padding:14px 24px;border-radius:14px;
+  font-size:13px;font-weight:600;font-family:var(--font-sans);
+  animation:slideInRight .35s var(--easing);
+  max-width:380px;box-shadow:0 10px 36px rgba(0,0,0,.45);
+  display:flex;align-items:center;gap:10px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+
+/* ── Animations ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes slideInRight{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeOut{from{opacity:1;max-height:500px}to{opacity:0;max-height:0;padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;border-width:0}}
+@keyframes slideUpFade{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes glowPulseBlue{0%,100%{box-shadow:0 0 15px rgba(30,64,175,.15)}50%{box-shadow:0 0 30px rgba(30,64,175,.25)}}
+.job-hidden{animation:fadeOut .35s var(--easing) forwards;overflow:hidden;pointer-events:none}
+.chart-container{position:relative;height:240px}
+.fade-in{animation:fadeIn .4s ease-out}
+.slide-up{animation:slideUpFade .4s var(--easing)}
+.slide-up-d1{animation:slideUpFade .4s .04s var(--easing) both}
+.slide-up-d2{animation:slideUpFade .4s .08s var(--easing) both}
+.slide-up-d3{animation:slideUpFade .4s .12s var(--easing) both}
+.slide-up-d4{animation:slideUpFade .4s .16s var(--easing) both}
+.slide-up-d5{animation:slideUpFade .4s .20s var(--easing) both}
+
+.pulse-dot{width:9px;height:9px;border-radius:50%;background:#10b981;display:inline-block;animation:pulse 2s infinite;box-shadow:0 0 10px #10b981}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 10px #10b981}50%{opacity:.35;box-shadow:0 0 20px #10b981}}
+
+/* ── Score ring ── */
+.score-ring{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:2px solid transparent;
+  transition:transform .2s var(--easing),border-color .2s var(--easing);
+  font-family:var(--font-mono);
+}
+.glass-card:hover .score-ring{transform:scale(1.05)}
+
+/* ── Scrollbar (thin, custom) ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(30,64,175,.25);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:rgba(30,64,175,.45)}
+
+/* ── Select Styling ── */
+select{
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;
+  cursor:pointer;
+}
+
+/* ── Focus states ── */
+input:focus,select:focus,textarea:focus,button:focus-visible{
+  outline:none;box-shadow:0 0 0 3px rgba(30,64,175,.25);
+}
+
+/* ── Ambient blobs (Financial blue) ── */
+.ambient-blob{
+  position:fixed;border-radius:50%;pointer-events:none;z-index:0;
+  filter:blur(120px);opacity:.05;
+}
+.ambient-blob.tl{width:400px;height:400px;background:#1E40AF;top:-100px;left:-100px}
+.ambient-blob.br{width:450px;height:450px;background:#3B82F6;bottom:-120px;right:-120px}
+
+/* ── Search bar glow ── */
+.search-glow:focus-within{
+  box-shadow:0 0 0 3px rgba(30,64,175,.15),0 0 30px rgba(30,64,175,.08);
+  border-color:rgba(30,64,175,.4) !important;
+}
+
+/* ── prefers-reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+}
+
+/* ── Mono font for scores, data, IDs ── */
+.font-mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+.font-sans{font-family:var(--font-sans);}
+
+/* ── cursor-pointer on interactive elements ── */
+button,a,select,.glass-card,.kpi-card,[role="button"]{cursor:pointer}
+
+/* ── Inline SVG icon defaults ── */
+.icon-svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="ambient-blob tl"></div>
+<div class="ambient-blob br"></div>
+<div id="root" style="position:relative;z-index:1"></div>
+<script type="text/babel">
+const { useState, useEffect, useMemo, useCallback, useRef, createContext, useContext } = React;
+
+// ─── Inline SVG Icon Components (Heroicons style) ──
+function SvgIcon({ d, size, className, strokeWidth, ...rest }) {
+  const { 'aria-hidden': _skip, ...svgProps } = rest;
+  return (
+    <svg className={`icon-svg ${className||''}`} style={{width:size||20,height:size||20}}
+      viewBox="0 0 24 24" strokeWidth={strokeWidth||2} aria-hidden="true" {...svgProps}>
+      <path d={d}/>
+    </svg>
+  );
+}
+
+// Heroicons paths
+const ICONS = {
+  chart: 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z',
+  target: 'M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm0 17.25c-4.142 0-7.5-3.358-7.5-7.5s3.358-7.5 7.5-7.5 7.5 3.358 7.5 7.5-3.358 7.5-7.5 7.5zm0-12c-2.485 0-4.5 2.015-4.5 4.5s2.015 4.5 4.5 4.5 4.5-2.015 4.5-4.5-2.015-4.5-4.5-4.5z',
+  home: 'M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z',
+  currency: 'M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+  trending: 'M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941',
+  search: 'M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z',
+  star: 'M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z',
+  trash: 'M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0',
+  clock: 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z',
+  send: 'M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5',
+  interview: 'M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155',
+  document: 'M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z',
+  chevronDown: 'M19.5 8.25l-7.5 7.5-7.5-7.5',
+  chevronUp: 'M4.5 15.75l7.5-7.5 7.5 7.5',
+  xMark: 'M6 18L18 6M6 6l12 12',
+  check: 'M4.5 12.75l6 6 9-13.5',
+  exclamation: 'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z',
+  information: 'M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z',
+};
+
+// ─── Debounce ────────────────────────────────────
+function useDebounce(value, delay=300) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
+
+// ─── Supabase Client ─────────────────────────────
+const supabase = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY) || null;
+
+async function saveToSupabase(url, status, notes) {
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('job_status').upsert({
+      url, status, notes: notes || '', updated_at: new Date().toISOString()
+    }, { onConflict: 'url' });
+    return !error;
+  } catch { return false; }
+}
+
+// ─── API ────────────────────────────────────────
+const API_BASE = '/api';
+async function apiCall(data) {
+  try {
+    const res = await fetch(`${API_BASE}/vagas/status`, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({url: data.url, status: data.status, notas: data.notes || '', timestamp: new Date().toISOString()})
+    });
+    return res.ok;
+  } catch { return false; }
+}
+
+// ─── Toast System ───────────────────────────────
+const ToastContext = createContext();
+
+function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
+  const addToast = useCallback((msg, type='info') => {
+    const id = Date.now() + Math.random();
+    setToasts(t => [...t, {id, msg, type}]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
+  }, []);
+
+  const toastConfig = {
+    success: { bg: 'rgba(16,185,129,.9)', icon: ICONS.check },
+    error:   { bg: 'rgba(239,68,68,.9)',  icon: ICONS.xMark },
+    warning: { bg: 'rgba(217,119,6,.9)',  icon: ICONS.exclamation },
+    info:    { bg: 'rgba(59,130,246,.9)',   icon: ICONS.information },
+  };
+
+  return (
+    <ToastContext.Provider value={addToast}>
+      {children}
+      <div aria-live="polite" role="status" style={{position:'fixed',top:24,right:24,zIndex:2000,display:'flex',flexDirection:'column',gap:10}}>
+        {toasts.map(t => (
+          <div key={t.id} className="toast" style={{background: (toastConfig[t.type]||toastConfig.info).bg, color:'white'}}>
+            <SvgIcon d={(toastConfig[t.type]||toastConfig.info).icon} size={18}/>
+            {t.msg}
+          </div>
+        ))}
+      </div>
+    </ToastContext.Provider>
+  );
+}
+
+// ─── Confirmation Modal ─────────────────────────
+function ConfirmModal({ open, title, message, confirmLabel, confirmColor, iconD, onConfirm, onCancel }) {
+  if (!open) return null;
+  return (
+    <div className="modal-overlay" onClick={onCancel} role="dialog" aria-modal="true">
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+            style={{background: confirmColor==='danger'?'rgba(239,68,68,.14)':'rgba(30,64,175,.14)'}}>
+            <SvgIcon d={iconD||ICONS.exclamation} size={22} style={{color: confirmColor==='danger'?'#f87171':'#60a5fa'}}/>
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white mb-1" style={{fontFamily:'var(--font-sans)'}}>{title}</h3>
+            <p className="text-sm text-gray-400 leading-relaxed">{message}</p>
+          </div>
+        </div>
+        <div className="flex gap-3 justify-end">
+          <button onClick={onCancel}
+            className="px-5 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white border border-gray-700/60 hover:border-gray-500 transition-colors duration-200 font-sans"
+            style={{background:'rgba(255,255,255,.02)',backdropFilter:'blur(6px)'}}>
+            Cancelar
+          </button>
+          <button onClick={onConfirm}
+            className={`px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition duration-200 font-sans ${confirmColor==='danger'?'bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25':'bg-accent hover:bg-blue-700 shadow-lg shadow-accent/25'}`}>
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Data Fetching ──────────────────────────────
+function extractLabel(row) {
+  const stack = (row.stack || []).map(String);
+  const summary = (row.summary || '').toLowerCase();
+  const keywords = {
+    n8n: ['n8n'], pipefy: ['pipefy'], 'Automação': ['automação', 'rpa', 'automation', 'workflow'],
+    IA: ['inteligência artificial', 'machine learning', 'deep learning', 'llm', 'chatgpt', 'openai', 'langchain'],
+    Dados: ['dados', 'data engineer', 'data science', 'analytics', 'power bi', 'tableau', 'sql', 'etl', 'big data'],
+    Dev: ['desenvolvedor', 'developer', 'programador', 'full stack', 'frontend', 'backend', 'react', 'node', 'python', 'java', '.net', 'golang'],
+    Cloud: ['cloud', 'aws', 'azure', 'gcp', 'devops', 'kubernetes', 'docker', 'terraform'],
+    'Low-Code': ['low-code', 'low code', 'no-code', 'bubble', 'retool', 'power apps'],
+    Processos: ['processos', 'bpm', 'bpmn', 'process', 'melhoria contínua', 'lean', 'six sigma'],
+    Projetos: ['projetos', 'project', 'pmbok', 'scrum', 'agile', 'ágil', 'kanban'],
+    CRM: ['crm', 'salesforce', 'hubspot', 'zendesk', 'customer success'],
+    ERP: ['erp', 'sap', 'oracle', 'totvs'],
+    BI: ['bi', 'business intelligence', 'dashboard', 'kpi'],
+    Analista: ['analista', 'analyst', 'análise'],
+    Designer: ['design', 'ux', 'ui', 'figma'],
+    Marketing: ['marketing', 'mídia', 'seo', 'sem', 'growth', 'conteúdo'],
+  };
+  const str = [...stack, summary].join(' ').toLowerCase();
+  for (const [cat, terms] of Object.entries(keywords)) {
+    if (terms.some(t => str.includes(t))) return cat;
+  }
+  return row.query_label || 'Outros';
+}
+
+async function fetchJobs() {
+  if (!supabase) { console.warn('Supabase indisponível'); return []; }
+  try {
+    const { data, error } = await supabase
+      .from('vw_jobs_full')
+      .select('*')
+      .order('fit_score', { ascending: false, nullsFirst: false });
+    if (error) { console.error('Supabase:', error); return []; }
+    return (data || [])
+      .filter(row => !row.is_blocked)
+      .filter(row => {
+        const t = (row.job_title || row.title || '').toLowerCase();
+        if (t.includes('afirmativa para mulheres') || t.includes('afirmativa mulheres')) return false;
+        if (t.includes('estágio') || t.includes('estagiário') || t.includes('estagiario')) return false;
+        if (/\bpo\b/i.test(t) && !t.includes('power') && !t.includes('platform')) return false;
+        if (t.includes('product owner') && !t.includes('platform') && !t.includes('process')) return false;
+        if (t.includes('gerente de projetos') || t.includes('project manager')) return false;
+        if (/consultor.*legal|legal\s*ops/i.test(t)) return false;
+        if (/analista\s+(de\s+)?produtos?\b/i.test(t)) return false;
+        if (/\bqa\b|quality\s+assurance/i.test(t)) return false;
+        if (/analista.*\bmarketing\b/i.test(t)) return false;
+        if (/\bdesign\b|ux|ui\b/i.test(t)) return false;
+        if (/coordenador\s+(de\s+)?vendas|inside\s*sales/i.test(t)) return false;
+        if (/\bdevops\b|sre\b|site\s*reliability/i.test(t)) return false;
+        if (/data\s*scientist|machine\s*learning/i.test(t)) return false;
+        if (/sap\s+(mm|sd|fi|co|pp|pm|hr|abap|basis)/i.test(t)) return false;
+        if (/assistente\s+(de\s+)?m[ií]dia/i.test(t)) return false;
+        if (/engenheir[oa].*inteligência\s*artificial/i.test(t)) return false;
+        if (/consultor\s+(de\s+)?implanta[çc][aã]o/i.test(t)) return false;
+        if (/\bj[uú]nior\b|\bjr\.?\b/i.test(t)) return false;
+        if (/analista\s+(de\s+)?qualidade/i.test(t)) return false;
+        if (/analista\s+(de\s+)?projetos/i.test(t)) return false;
+        if (/software\s*engineer|desenvolvedor|full\s*stack|backend|frontend/i.test(t) && !/automa[çc]|n8n|pipefy|low.code|rpa/i.test(t)) return false;
+        if (/\bpcd\b/i.test(t)) return false;
+        if (/\bsales\s*(ops|operations)\b|executivo\s+(de\s+)?contas|executivo\s+(de\s+)?vendas/i.test(t)) return false;
+        if (/analista\s+comercial|comercial\s+transportadora|vendedor|consultor\s+(de\s+)?vendas/i.test(t)) return false;
+        if (/log[íi]stic[oa]|supply\s*chain/i.test(t)) return false;
+        if (/compras|procurement|purchasing/i.test(t)) return false;
+        if (/operador\s+log[íi]stic/i.test(t)) return false;
+        if (/gerente\s+(de\s+)?agilidade|coach\s+([áa]gil|agil)|agile\s*coach|scrum\s*master/i.test(t)) return false;
+        if (/seguran[ça]\w*\s+(da\s+)?informa[çc][aã]o|security\s*engineer/i.test(t)) return false;
+        if (/deloitte|pwc\b|accenture|avanade|kpmg|ernst|ey\b/i.test(t)) return false;
+        if (/estoquista|almoxarif|expedi[çc][aã]o/i.test(t)) return false;
+        const loc = (row.location || '').toLowerCase();
+        if (loc && !/sp|s[aã]o paulo|remoto|home office|híbrido|hibrido|brasil|brazil/i.test(loc)) return false;
+        return true;
+      })
+      .map(row => ({
+        url: row.url,
+        title: row.job_title || row.title || '',
+        company: row.job_company || row.company || '',
+        location: row.location || '',
+        score: row.score || 0,
+        published: row.published || '',
+        searched_at: row.searched_at || '',
+        salary: row.salary || '',
+        salary_min: row.salary_min || null,
+        salary_max: row.salary_max || null,
+        work_model: row.work_model || '',
+        seniority: row.seniority || '',
+        contract_type: row.contract_type || '',
+        requirements: row.requirements || [],
+        benefits: row.benefits || [],
+        stack: row.stack || [],
+        summary: row.summary || '',
+        fit_score: row.fit_score || 0,
+        ai_match: (row.fit_score || row.match_level) ? {
+          fit_score: row.fit_score,
+          match_level: row.match_level,
+          strengths: row.strengths || [],
+          gaps: row.gaps || [],
+          recommendation: row.recommendation || ''
+        } : null,
+        query_label: extractLabel(row),
+        _status: row.status || 'pending',
+        _notes: row.notes || '',
+      }));
+  } catch (e) { console.error('fetchJobs:', e); return []; }
+}
+
+// ─── KPI Cards — Bullet Chart Style ─────────────
+function KpiCard({ iconD, iconBg, label, value, sub, delta, trend, idx, bulletPct, bulletTargetPct, bulletColor }) {
+  const trendLabel = trend === 'up' ? 'UP' : trend === 'down' ? 'DOWN' : '';
+  const trendColor = trend === 'up' ? '#34d399' : trend === 'down' ? '#f87171' : '#94a3b8';
+
+  const barColors = ['#1E40AF','#10b981','#3B82F6','#D97706','#EF4444'];
+  const color = bulletColor || barColors[(idx||0) % barColors.length];
+  const targetColor = '#D97706';
+
+  return (
+    <div className={`kpi-card slide-up-d${(idx||0)+1}`}>
+      <div className="flex items-start gap-3 relative z-10">
+        <div className="kpi-icon" style={{
+          background: `${iconBg||'rgba(30,64,175,.15)'}`,
+          boxShadow: `0 4px 16px ${iconBg||'rgba(30,64,175,.2)'}`
+        }}>
+          <SvgIcon d={iconD||ICONS.chart} size={22} style={{color:'#60a5fa'}}/>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="text-2xl lg:text-3xl font-bold text-white tracking-tight font-mono">{value}</span>
+            {delta && (
+              <span className="text-xs font-semibold flex items-center gap-1 font-mono" style={{color:trendColor}}>
+                {trendLabel} {delta}
+              </span>
+            )}
+          </div>
+          <div className="text-xs text-gray-400 mt-1 font-medium tracking-wider uppercase font-sans"
+            style={{letterSpacing:'.12em'}}>{label}</div>
+          {sub && <div className="text-[10px] text-gray-600 mt-0.5 font-mono">{sub}</div>}
+        </div>
+      </div>
+      {/* Bullet chart bar */}
+      <div className="kpi-bullet-bar relative z-10">
+        <div className="kpi-bullet-fill" style={{
+          '--kpi-color': color,
+          '--kpi-color-glow': color+'cc',
+          width: `${Math.min(bulletPct||50, 100)}%`
+        }}></div>
+        {bulletTargetPct !== undefined && bulletTargetPct !== null && (
+          <div className="kpi-bullet-target" style={{
+            left: `${Math.min(bulletTargetPct, 100)}%`,
+            '--kpi-target-color': targetColor
+          }}></div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function KpiRow({ jobs, filteredCount }) {
+  const total = jobs.length;
+  const avgScore = total ? Math.round(jobs.reduce((s,j)=>s+(j.fit_score||0),0)/total) : 0;
+  const remoteCount = jobs.filter(j => {
+    const m = (j.work_model||'').toLowerCase();
+    return m.includes('remoto')||m.includes('remote')||m.includes('híbr')||m.includes('hybrid');
+  }).length;
+  const salaries = jobs.filter(j=>j.salary_min).map(j=>j.salary_min);
+  const avgSalary = salaries.length ? Math.round(salaries.reduce((a,b)=>a+b,0)/salaries.length) : null;
+  const maxSalary = salaries.length ? Math.max(...salaries) : 0;
+  const seniorities = jobs.map(j=>j.seniority).filter(Boolean);
+  const topSeniority = [...new Set(seniorities)].slice(0,2).join(' · ') || '—';
+  const pendingCount = jobs.filter(j=>(j._status||'pending')==='pending').length;
+  const pctRemote = total ? Math.round(remoteCount/total*100) : 0;
+  const scoreTarget = 65; // target match score
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-4 mb-10">
+      <KpiCard idx={0} iconD={ICONS.document} iconBg="rgba(30,64,175,.15)"
+        label="Total de Vagas" value={total}
+        sub={`${filteredCount} exibidas`}
+        bulletPct={Math.min(total>0?100:0,100)} bulletTargetPct={null} bulletColor="#1E40AF"/>
+      <KpiCard idx={1} iconD={ICONS.target} iconBg="rgba(16,185,129,.15)"
+        label="Match Medio AI" value={`${avgScore}%`}
+        sub={avgScore>=60?'Forte':avgScore>=35?'Moderado':'Baixo'}
+        delta={avgScore>=60?'Alta compatibilidade':null} trend={avgScore>=60?'up':'flat'}
+        bulletPct={Math.min(avgScore,100)} bulletTargetPct={scoreTarget} bulletColor="#10b981"/>
+      <KpiCard idx={2} iconD={ICONS.home} iconBg="rgba(30,64,175,.15)"
+        label="Remotas/Hibridas" value={remoteCount}
+        sub={`${pctRemote}% do total`} delta={`${pctRemote}%`} trend="up"
+        bulletPct={Math.min(pctRemote,100)} bulletTargetPct={50} bulletColor="#3B82F6"/>
+      <KpiCard idx={3} iconD={ICONS.currency} iconBg="rgba(217,119,6,.15)"
+        label="Salario Medio"
+        value={avgSalary?`R$ ${(avgSalary/1000).toFixed(0)}k`:'N/D'}
+        sub={avgSalary?`Ate R$ ${Math.round(maxSalary/1000)}k`:'Sem dados'}
+        bulletPct={avgSalary?Math.min((avgSalary/15000)*100,100):0} bulletTargetPct={60} bulletColor="#D97706"/>
+      <KpiCard idx={4} iconD={ICONS.trending} iconBg="rgba(239,68,68,.15)"
+        label="Senioridade Top" value={topSeniority==='—'?'N/D':topSeniority}
+        sub={`${pendingCount} pendentes`}
+        bulletPct={topSeniority!=='—'?70:10} bulletTargetPct={null} bulletColor="#EF4444"/>
+    </div>
+  );
+}
+
+// ─── Enhanced Charts ────────────────────────────
+function ChartSection({ jobs }) {
+  const categoryData = useMemo(() => {
+    const c = {};
+    jobs.forEach(j => { const x = j.query_label || 'Outros'; c[x] = (c[x]||0)+1; });
+    return Object.entries(c).sort((a,b) => b[1]-a[1]).slice(0,8);
+  }, [jobs]);
+
+  const modelData = useMemo(() => {
+    const m = {};
+    jobs.forEach(j => { const x = j.work_model || 'Nao informado'; m[x] = (m[x]||0)+1; });
+    return Object.entries(m);
+  }, [jobs]);
+
+  useEffect(() => {
+    Chart.getChart('chartCategory')?.destroy();
+    Chart.getChart('chartModel')?.destroy();
+    const ctx1 = document.getElementById('chartCategory')?.getContext('2d');
+    const ctx2 = document.getElementById('chartModel')?.getContext('2d');
+
+    const gradColors = ['rgba(30,64,175,.75)','rgba(59,130,246,.75)','rgba(16,185,129,.75)','rgba(217,119,6,.75)','rgba(239,68,68,.75)','rgba(99,102,241,.75)','rgba(56,189,248,.75)','rgba(251,146,60,.75)'];
+
+    if (ctx1) new Chart(ctx1, {
+      type:'bar',
+      data:{
+        labels: categoryData.map(c=>c[0]),
+        datasets:[{
+          label:'Vagas',
+          data: categoryData.map(c=>c[1]),
+          backgroundColor: categoryData.map((_,i)=>gradColors[i]||gradColors[0]),
+          borderColor:'transparent',borderWidth:0,borderRadius:10,borderSkipped:false,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(2,6,23,.95)',titleColor:'#fff',bodyColor:'#cbd5e1',cornerRadius:12,padding:14,displayColors:false}},
+        scales:{
+          y:{beginAtZero:true,ticks:{color:'#64748b',font:{size:11}},grid:{color:'rgba(255,255,255,.05)'},border:{display:false}},
+          x:{ticks:{color:'#64748b',font:{size:10},maxRotation:40},grid:{display:false},border:{display:false}}
+        },
+        animation:{duration:1000,easing:'easeOutQuart'}
+      }
+    });
+
+    if (ctx2) new Chart(ctx2, {
+      type:'doughnut',
+      data:{
+        labels: modelData.map(m=>m[0]),
+        datasets:[{
+          data: modelData.map(m=>m[1]),
+          backgroundColor:['#1E40AF','#3B82F6','#10b981','#D97706','#ef4444','#6366f1'],
+          borderWidth:3,borderColor:'rgba(2,6,23,.6)',
+          hoverBorderColor:'rgba(255,255,255,.15)',hoverBorderWidth:4,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,cutout:'68%',
+        plugins:{
+          legend:{position:'bottom',labels:{color:'#94a3b8',padding:20,usePointStyle:true,pointStyleWidth:12,font:{size:11}}},
+          tooltip:{backgroundColor:'rgba(2,6,23,.95)',titleColor:'#fff',bodyColor:'#cbd5e1',cornerRadius:12,padding:14}
+        },
+        animation:{animateScale:true,animateRotate:true,duration:1200}
+      }
+    });
+  }, [categoryData, modelData]);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+      <div className="glass-card p-6 fade-in" style={{animationDelay:'.3s'}}>
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-sm font-semibold text-gray-300 flex items-center gap-2 font-sans" style={{"textWrap":"balance"}}>
+            <span className="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_8px_rgba(30,64,175,.5)]"></span>
+            <span className="tracking-wider uppercase text-[11px]">Vagas por Categoria</span>
+          </h3>
+          <span className="text-[10px] text-gray-600 font-medium font-mono">{categoryData.length} categorias</span>
+        </div>
+        <div className="chart-container"><canvas id="chartCategory" role="img" aria-label="Gráfico de barras: vagas por categoria"></canvas></div>
+      </div>
+      <div className="glass-card p-6 fade-in" style={{animationDelay:'.4s'}}>
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-sm font-semibold text-gray-300 flex items-center gap-2 font-sans" style={{"textWrap":"balance"}}>
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,.5)]"></span>
+            <span className="tracking-wider uppercase text-[11px]">Modelo de Trabalho</span>
+          </h3>
+          <span className="text-[10px] text-gray-600 font-medium font-mono">{modelData.length} tipos</span>
+        </div>
+        <div className="chart-container"><canvas id="chartModel" role="img" aria-label="Gráfico de rosca: vagas por modelo de trabalho"></canvas></div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Quick Filter Pills ─────────────────────────
+function QuickFilters({ filters, setFilters, jobs }) {
+  const counts = {
+    favorita: jobs.filter(j=>j._status==='favorita').length,
+    descartada: jobs.filter(j=>j._status==='descartada').length,
+    expirada: jobs.filter(j=>j._status==='expirada').length,
+    todas: jobs.length,
+  };
+
+  const pills = [
+    { label:'Favoritas', status:'favorita', count:counts.favorita, color:'rgba(245,158,11,.12)', textColor:'#fbbf24', iconD:ICONS.star },
+    { label:'Descartadas', status:'descartada', count:counts.descartada, color:'rgba(239,68,68,.1)', textColor:'#f87171', iconD:ICONS.trash },
+    { label:'Expiradas', status:'expirada', count:counts.expirada, color:'rgba(100,116,139,.1)', textColor:'#94a3b8', iconD:ICONS.clock },
+    { label:'Todas', status:'', count:counts.todas, color:'rgba(30,64,175,.1)', textColor:'#60a5fa', iconD:ICONS.document },
+  ];
+
+  return (
+    <div className="flex gap-2.5 mb-5 flex-wrap">
+      {pills.map(p => {
+        const active = p.status ? filters.status===p.status : !filters.status;
+        return (
+          <button key={p.status}
+            aria-label={`Filtrar por ${p.label} (${p.count} vagas)`}
+            onClick={() => setFilters({...filters, status: p.status===filters.status ? '' : p.status})}
+            style={active ? {
+              background: p.color,
+              border: `1px solid ${p.textColor}40`,
+              color: p.textColor,
+              boxShadow: active ? `0 4px 16px ${p.textColor}20` : 'none',
+            } : {
+              background: 'rgba(255,255,255,.02)',
+              border: '1px solid rgba(51,65,85,.2)',
+              color: '#9ca3af',
+            }}
+            className="px-4 py-2.5 rounded-xl text-xs font-semibold transition duration-200 flex items-center gap-2 backdrop-blur-sm hover:-translate-y-0.5 font-sans">
+            <SvgIcon d={p.iconD} size={14}/>
+            <span>{p.label}</span>
+            <span style={{
+              background: active ? `${p.textColor}25` : 'rgba(255,255,255,.06)',
+              color: active ? p.textColor : '#6b7280',
+            }} className="text-[10px] px-2 py-0.5 rounded-full font-bold font-mono">{p.count}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Enhanced Filter Bar ────────────────────────
+function FilterBar({ jobs, filters, setFilters, searchRaw, setSearchRaw, visibleCount }) {
+  const cats = [...new Set(jobs.map(j=>j.query_label).filter(Boolean))].sort();
+  const models = [...new Set(jobs.map(j=>j.work_model).filter(Boolean))].sort();
+
+  return (
+    <div className="glass-card p-4 mb-6 flex flex-wrap gap-3 items-center" style={{
+      background:'rgba(14,18,35,.55)',backdropFilter:'blur(20px)'
+    }}>
+      <div className="relative flex-1 min-w-[220px] max-w-[300px] search-glow">
+        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+          <SvgIcon d={ICONS.search} size={16}/>
+        </span>
+        <input type="text" placeholder="Buscar cargo ou empresa…"
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors duration-200 font-sans"
+          style={{backdropFilter:'blur(8px)'}} autoComplete="off" spellCheck="false"
+          aria-label="Buscar vagas por cargo ou empresa"
+          value={searchRaw} onChange={e=>setSearchRaw(e.target.value)} />
+      </div>
+      <select className="bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.05] font-sans"
+        style={{backdropFilter:'blur(8px)'}}
+        aria-label="Filtrar por categoria"
+        value={filters.category} onChange={e=>setFilters({...filters,category:e.target.value})}>
+        <option value="">Todas categorias</option>
+        {cats.map(c=><option key={c} value={c}>{c}</option>)}
+      </select>
+      <select className="bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.05] font-sans"
+        style={{backdropFilter:'blur(8px)'}}
+        aria-label="Filtrar por modelo de trabalho"
+        value={filters.model} onChange={e=>setFilters({...filters,model:e.target.value})}>
+        <option value="">Todos modelos</option>
+        {models.map(m=><option key={m} value={m}>{m}</option>)}
+      </select>
+      <select className="bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.05] font-sans"
+        style={{backdropFilter:'blur(8px)'}}
+        aria-label="Ordenar vagas"
+        value={filters.sort} onChange={e=>setFilters({...filters,sort:e.target.value})}>
+        <option value="score">Melhor Match</option>
+        <option value="salary">Maior Salario</option>
+        <option value="recent">Mais Recentes</option>
+      </select>
+      <select className="bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.05] font-sans"
+        style={{backdropFilter:'blur(8px)'}}
+        aria-label="Filtrar por status"
+        value={filters.status} onChange={e=>setFilters({...filters,status:e.target.value})}>
+        <option value="">Todos status</option>
+        <option value="pending">Pendentes</option>
+        <option value="favorita">Favoritas</option>
+        <option value="descartada">Descartadas</option>
+        <option value="expirada">Expiradas</option>
+      </select>
+      <span className="text-[11px] text-gray-500 ml-auto font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg font-mono"
+        style={{background:'rgba(30,64,175,.08)',border:'1px solid rgba(30,64,175,.12)'}}>
+        {visibleCount}<span className="text-gray-600">/{jobs.length}</span> vagas
+      </span>
+    </div>
+  );
+}
+
+// ─── Job Card ───────────────────────────────────
+function JobCard({ job, onRemove, idx }) {
+  const addToast = useContext(ToastContext);
+  const [status, setStatus] = useState(job._status || 'pending');
+  const [expanded, setExpanded] = useState(false);
+  const [modal, setModal] = useState(null);
+  const [notes, setNotes] = useState(job._notes || '');
+  const [hiding, setHiding] = useState(false);
+
+  const staggerDelay = `${0.06 * (idx || 0)}s`;
+
+  const handleAction = async (newStatus) => {
+    if (newStatus === 'discard' || newStatus === 'expire') {
+      setModal(newStatus);
+      return;
+    }
+    const target = newStatus === 'favorita' && status === 'favorita' ? 'pending' : newStatus;
+    await applyStatus(target);
+  };
+
+  const applyStatus = async (newStatus) => {
+    const old = status;
+    setStatus(newStatus);
+    setModal(null);
+
+    const [supOk, apiOk] = await Promise.all([
+      saveToSupabase(job.url, newStatus, notes),
+      apiCall({ url: job.url, status: newStatus, notes })
+    ]);
+
+    if (!supOk && !apiOk) {
+      setStatus(old);
+      addToast('Erro ao salvar', 'error');
+      return;
+    }
+
+    const msgs = {
+      descartada:'Vaga removida', expirada:'Expirada', pending:'Restaurada'
+    };
+    addToast(msgs[newStatus]||'Atualizado', (newStatus==='descartada'||newStatus==='expirada')?'warning':'success');
+
+    if (newStatus === 'descartada' || newStatus === 'expirada') {
+      setHiding(true);
+      setTimeout(() => onRemove(job.url), 350);
+    }
+  };
+
+  const score = job.fit_score || 0;
+  const scColor = score >= 70 ? '#34d399' : score >= 40 ? '#FBBF24' : '#94a3b8';
+  const scBg = score >= 70 ? 'rgba(16,185,129,.12)' : score >= 40 ? 'rgba(217,119,6,.12)' : 'rgba(100,116,139,.1)';
+  const scBorder = score >= 70 ? 'rgba(16,185,129,.25)' : score >= 40 ? 'rgba(217,119,6,.2)' : 'rgba(100,116,139,.15)';
+  const sourceDomain = (() => { try { return new URL(job.url).hostname.replace('www.',''); } catch { return ''; } })();
+
+  const wm = (job.work_model||'').toLowerCase();
+  const isRemote = wm.includes('remoto')||wm.includes('remote');
+  const isHybrid = wm.includes('híbr')||wm.includes('hybrid');
+
+  const statusBadge = status==='favorita'?{label:'Favorita',cls:'bg-amber-500/12 text-amber-400 border-amber-500/18',iconD:ICONS.star}
+    :status==='descartada'?{label:'Descartada',cls:'bg-red-500/12 text-red-400 border-red-500/18',iconD:ICONS.trash}
+    :status==='expirada'?{label:'Expirada',cls:'bg-slate-500/12 text-slate-400 border-slate-500/18',iconD:ICONS.clock}
+    :null;
+
+  return (
+    <>
+      <ConfirmModal open={modal==='discard'}
+        title="Descartar vaga"
+        message={`"${job.title?.substring(0,70)}…" sera removida da grade de vagas.`}
+        confirmLabel="Sim, descartar" confirmColor="danger" iconD={ICONS.trash}
+        onConfirm={() => applyStatus('descartada')} onCancel={() => setModal(null)} />
+
+      <ConfirmModal open={modal==='expire'}
+        title="Expirar vaga"
+        message={`"${job.title?.substring(0,70)}…" sera marcada como expirada e removida.`}
+        confirmLabel="Sim, expirar" confirmColor="danger" iconD={ICONS.clock}
+        onConfirm={() => applyStatus('expirada')} onCancel={() => setModal(null)} />
+
+      <div className={`glass-card p-5 ${hiding?'job-hidden':''}`}
+        style={{animation: `cardStaggerIn .5s ${staggerDelay} var(--easing) both`}}>
+        {/* Header Row */}
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1.5">
+              {job.ai_match && <span className="badge badge-ai">AI Match</span>}
+              {score>=70 ? <span className="badge badge-score-high">{score}%</span>
+                : score>=40 ? <span className="badge badge-score-mid">{score}%</span>
+                : score>0 ? <span className="badge bg-white/[0.04] text-gray-500 border border-white/[0.06] font-mono">{score}%</span>
+                : null}
+              {isRemote && <span className="badge badge-remote">Remoto</span>}
+              {isHybrid && <span className="badge badge-hybrid">Hibrido</span>}
+              {!isRemote && !isHybrid && job.work_model && <span className="badge bg-white/[0.04] text-gray-400 border border-white/[0.06]">{job.work_model}</span>}
+              {job.salary && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15 font-mono">R$ {job.salary}</span>}
+              {!job.salary && job.salary_min && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15 font-mono">R$ {Math.round(job.salary_min/1000)}k{job.salary_max?`-${Math.round(job.salary_max/1000)}k`:''}</span>}
+              {job.seniority && <span className="badge bg-accent/10 text-accent-glow border border-accent/18">{job.seniority}</span>}
+              {sourceDomain && <span className="badge bg-white/[0.04] text-gray-400 border border-white/[0.06] font-mono">{sourceDomain}</span>}
+              {statusBadge && <span className={`badge border ${statusBadge.cls}`}><SvgIcon d={statusBadge.iconD} size={12}/> {statusBadge.label}</span>}
+            </div>
+            <h3 className="text-base lg:text-lg font-semibold text-white leading-snug mb-0.5 font-sans" style={{"textWrap":"balance"}}>
+              <a href={job.url} target="_blank" rel="noopener"
+                className="hover:text-accent-glow transition-colors duration-200 decoration-accent/30 hover:underline underline-offset-2">
+                {job.title || 'Sem titulo'}
+              </a>
+            </h3>
+            <p className="text-xs text-gray-500 font-sans">{job.company || 'Empresa'}{job.location ? ` · ${job.location}` : ''}</p>
+          </div>
+          {/* Score ring */}
+          <div className="shrink-0 text-center">
+            <div className="score-ring" style={{background:scBg, borderColor:scBorder}}>
+              <span className="text-xl font-extrabold font-mono" style={{color:scColor}}>{score}</span>
+              <span className="text-[9px] text-gray-500 font-semibold -mt-1 font-mono">%</span>
+            </div>
+            <div className="text-[9px] text-gray-600 mt-1 font-medium tracking-wider uppercase font-mono">match</div>
+          </div>
+        </div>
+
+        {/* Expanded Details */}
+        {expanded && (
+          <div className="mt-4 pt-4 border-t border-white/[0.06] space-y-4">
+            {job.summary && <p className="text-xs text-gray-400 leading-relaxed font-sans">{job.summary}</p>}
+            {job.requirements?.length>0 && (
+              <div>
+                <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest font-sans">Requisitos</span>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {job.requirements.slice(0,6).map((r,i) => (
+                    <span key={i} className="text-[11px] bg-white/[0.03] text-gray-400 px-3 py-1.5 rounded-lg border border-white/[0.05] font-sans">{r}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {job.stack?.length>0 && (
+              <div>
+                <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest font-sans">Stack</span>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {job.stack.map((s,i) => (
+                    <span key={i} className="text-[11px] bg-accent/12 text-accent-glow px-3 py-1.5 rounded-lg border border-accent/18 font-mono">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {job.ai_match && (
+              <div className="rounded-2xl p-5 border"
+                style={{background:'rgba(30,64,175,.04)', borderColor:'rgba(30,64,175,.12)'}}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px]">
+                  {job.ai_match.strengths?.length>0 && (
+                    <div>
+                      <span className="text-emerald-400 font-semibold text-[10px] uppercase tracking-widest font-sans">Forcas</span>
+                      <p className="text-gray-300 mt-1.5 leading-relaxed font-sans">{job.ai_match.strengths.slice(0,3).join(' · ')}</p>
+                    </div>
+                  )}
+                  {job.ai_match.gaps?.length>0 && (
+                    <div>
+                      <span className="text-red-400 font-semibold text-[10px] uppercase tracking-widest font-sans">Gaps</span>
+                      <p className="text-gray-300 mt-1.5 leading-relaxed font-sans">{job.ai_match.gaps.slice(0,2).join(' · ')}</p>
+                    </div>
+                  )}
+                </div>
+                {job.ai_match.recommendation && (
+                  <p className="text-[11px] text-gray-300 mt-4 italic border-t pt-4 font-sans"
+                    style={{borderColor:'rgba(30,64,175,.1)'}}>{job.ai_match.recommendation}</p>
+                )}
+              </div>
+            )}
+            <div>
+              <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest block mb-2 font-sans">Notas</label>
+              <textarea
+                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-xs text-white resize-none placeholder-gray-600 transition-colors duration-200 font-sans"
+                style={{backdropFilter:'blur(6px)'}}
+                aria-label="Anotações sobre esta vaga"
+                rows="2" value={notes}
+                onChange={e => setNotes(e.target.value)}
+                placeholder="Anotacoes sobre esta vaga…" />
+            </div>
+          </div>
+        )}
+
+        {/* Actions Row */}
+        <div className="flex items-center justify-between mt-4 pt-4 border-t" style={{borderColor:'rgba(255,255,255,.06)'}}>
+          <button onClick={() => setExpanded(!expanded)}
+            aria-label={expanded?'Mostrar menos detalhes':'Mostrar mais detalhes'}
+            className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors font-medium flex items-center gap-1.5 font-sans">
+            <SvgIcon d={expanded?ICONS.chevronUp:ICONS.chevronDown} size={10}/>
+            {expanded ? 'Menos detalhes' : 'Mais detalhes'}
+          </button>
+          <div className="flex gap-1.5 flex-wrap justify-end">
+            <button onClick={()=>handleAction('favorita')} className={`action-btn btn-fav ${status==='favorita'?'active':''}`} aria-label={status==='favorita'?'Remover dos favoritos':'Favoritar vaga'}><SvgIcon d={ICONS.star} size={13}/> Favoritar</button>
+            <button onClick={()=>handleAction('block')} className="action-btn btn-block" aria-label="Bloquear vaga"><SvgIcon d={ICONS.shield} size={13}/> Bloquear</button>
+            <button onClick={()=>handleAction('discard')} className="action-btn btn-discard" aria-label="Descartar vaga"><SvgIcon d={ICONS.trash} size={13}/> Descartar</button>
+            <button onClick={()=>handleAction('expire')} className="action-btn btn-expire" aria-label="Marcar como expirada"><SvgIcon d={ICONS.clock} size={13}/> Expirar</button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ─── App ────────────────────────────────────────
+function App() {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({ search:'', category:'', model:'', sort:'score', status:'' });
+  const [searchRaw, setSearchRaw] = useState('');
+  const debouncedSearch = useDebounce(searchRaw, 300);
+
+  useEffect(() => { setFilters(f => ({...f, search: debouncedSearch})); }, [debouncedSearch]);
+
+  useEffect(() => {
+    fetchJobs().then(j => { setJobs(j); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  const removeJob = useCallback((url) => {
+    setJobs(prev => prev.filter(j => j.url !== url));
+  }, []);
+
+  const filtered = useMemo(() => {
+    let r = [...jobs];
+    if (!filters.status) r = r.filter(j => (j._status||'pending')!=='descartada' && (j._status||'pending')!=='expirada');
+    if (filters.search) { const s = filters.search.toLowerCase(); r = r.filter(j => (j.title||'').toLowerCase().includes(s) || (j.company||'').toLowerCase().includes(s)); }
+    if (filters.category) r = r.filter(j => j.query_label === filters.category);
+    if (filters.model) r = r.filter(j => j.work_model === filters.model);
+    if (filters.status) r = r.filter(j => (j._status||'pending') === filters.status);
+    if (filters.sort==='salary') r.sort((a,b) => (b.salary_min||0)-(a.salary_min||0));
+    return r;
+  }, [jobs, filters]);
+
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-5">
+      <div className="w-14 h-14 rounded-2xl flex items-center justify-center animate-pulse"
+        style={{background:'rgba(30,64,175,.15)',border:'1px solid rgba(30,64,175,.2)'}}>
+        <SvgIcon d={ICONS.search} size={26} style={{color:'#60a5fa'}}/>
+      </div>
+      <div className="text-lg text-accent-glow font-bold animate-pulse font-sans">{'Buscando vagas…'}</div>
+      <div className="text-xs text-gray-600 font-mono">Conectando ao Supabase</div>
+    </div>
+  );
+
+  return (
+    <ToastProvider>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        {/* Header */}
+        <header className="text-center mb-10 fade-in relative">
+          <div className="inline-flex items-center gap-3 mb-5 px-4 py-1.5 rounded-full"
+            style={{background:'rgba(30,64,175,.06)',border:'1px solid rgba(30,64,175,.12)',backdropFilter:'blur(8px)'}}>
+            <div className="pulse-dot"></div>
+            <span className="text-[10px] text-gray-400 uppercase tracking-[.18em] font-bold font-sans">Pipeline ativo</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-4 tracking-tight font-sans" style={{"textWrap":"balance"}}>
+            <span className="glow-title">Headhunter</span>
+            <span className="text-white"> Preditivo</span>
+          </h1>
+          <p className="text-sm text-gray-500 max-w-lg mx-auto leading-relaxed font-sans">
+            Pipeline de vagas com IA · Match inteligente · Score automatico · Supabase-first
+          </p>
+          <div className="flex justify-center gap-6 mt-6 text-[11px] text-gray-600 font-medium font-mono">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" style={{boxShadow:'0 0 6px #10b981'}}></span>
+              Front: v%%DEPLOY_VERSION%% — %%DEPLOY_TIME%%
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent" style={{boxShadow:'0 0 6px #1E40AF'}}></span>
+              DeepSeek v4 Pro
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" style={{boxShadow:'0 0 6px #3B82F6'}}></span>
+              {jobs.length} vagas no banco
+            </span>
+          </div>
+        </header>
+
+        <KpiRow jobs={jobs} filteredCount={filtered.length} />
+        <ChartSection jobs={filtered} />
+        <QuickFilters filters={filters} setFilters={setFilters} jobs={jobs} />
+        <FilterBar jobs={filtered} filters={filters} setFilters={setFilters} searchRaw={searchRaw} setSearchRaw={setSearchRaw} visibleCount={filtered.length} />
+
+        {/* Job Cards Grid */}
+        <div className="space-y-4">
+          {filtered.map((job, i) => <JobCard key={job.url || i} job={job} onRemove={removeJob} idx={i} />)}
+        </div>
+
+        {filtered.length===0 && (
+          <div className="text-center py-28">
+            <div className="mb-6 opacity-30 flex justify-center">
+              <SvgIcon d={ICONS.search} size={56} style={{color:'#94a3b8'}}/>
+            </div>
+            <p className="text-gray-500 font-medium text-lg font-sans">Nenhuma vaga encontrada</p>
+            <p className="text-xs text-gray-700 mt-1.5 font-sans">Tente ajustar os filtros ou limpar a busca.</p>
+          </div>
+        )}
+
+        {/* Footer */}
+        <footer className="text-center mt-16 py-8 border-t" style={{borderColor:'rgba(51,65,85,.2)'}}>
+          <p className="text-[11px] text-gray-700 font-medium tracking-wide font-mono">
+            Job Hunter V10 · Supabase + DeepSeek + React 18 · Hermes Agent Ecosystem
+          </p>
+          <p className="text-[10px] text-gray-800 mt-1 font-mono">Design System: Financial Dashboard Dark · Blue/Amber · Glassmorphism</p>
+        </footer>
+      </div>
+    </ToastProvider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
