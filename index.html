@@ -756,7 +756,7 @@ function ChartSection({ jobs }) {
   }, [categoryData, modelData]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+    <div className={`grid grid-cols-1 md:grid-cols-2 gap-5 mb-10 ${categoryData.length <= 1 && modelData.length <= 1 ? 'hidden' : ''}`}>
       <div className="glass-card p-6 fade-in" style={{animationDelay:'.3s'}}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-sm font-semibold text-gray-300 flex items-center gap-2 font-sans" style={{"textWrap":"balance"}}>
@@ -785,6 +785,7 @@ function ChartSection({ jobs }) {
 function QuickFilters({ filters, setFilters, jobs }) {
   const counts = {
     favorita: jobs.filter(j=>j._status==='favorita').length,
+    inscrito: jobs.filter(j=>j._status==='inscrito').length,
     descartada: jobs.filter(j=>j._status==='descartada').length,
     expirada: jobs.filter(j=>j._status==='expirada').length,
     todas: jobs.length,
@@ -792,6 +793,7 @@ function QuickFilters({ filters, setFilters, jobs }) {
 
   const pills = [
     { label:'Favoritas', status:'favorita', count:counts.favorita, color:'rgba(245,158,11,.12)', textColor:'#fbbf24', iconD:ICONS.star },
+    { label:'Inscritas', status:'inscrito', count:counts.inscrito, color:'rgba(129,140,248,.12)', textColor:'#a5b4fc', iconD:ICONS.check },
     { label:'Descartadas', status:'descartada', count:counts.descartada, color:'rgba(239,68,68,.1)', textColor:'#f87171', iconD:ICONS.trash },
     { label:'Expiradas', status:'expirada', count:counts.expirada, color:'rgba(100,116,139,.1)', textColor:'#94a3b8', iconD:ICONS.clock },
     { label:'Todas', status:'', count:counts.todas, color:'rgba(30,64,175,.1)', textColor:'#60a5fa', iconD:ICONS.document },
@@ -1165,7 +1167,7 @@ function App() {
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500" style={{boxShadow:'0 0 6px #3B82F6'}}></span>
-              {jobs.length} vagas no banco
+              {new Date().toLocaleDateString('pt-BR', {weekday:'short'})} · Pipeline ativo
             </span>
           </div>
         </header>
