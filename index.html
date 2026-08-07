@@ -993,7 +993,7 @@ function JobCard({ job, onRemove, idx }) {
               {isRemote && <span className="badge badge-remote">Remoto</span>}
               {isHybrid && <span className="badge badge-hybrid">Hibrido</span>}
               {!isRemote && !isHybrid && job.work_model && <span className="badge bg-white/[0.04] text-gray-400 border border-white/[0.06]">{job.work_model}</span>}
-              {job.salary && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15 font-mono">R$ {job.salary}</span>}
+              {job.salary && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15 font-mono">{(job.salary.startsWith('R$')||job.salary.startsWith('R$ '))?job.salary:`R$ ${job.salary}`}</span>}
               {!job.salary && job.salary_min && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15 font-mono">R$ {Math.round(job.salary_min/1000)}k{job.salary_max?`-${Math.round(job.salary_max/1000)}k`:''}</span>}
               {job.seniority && <span className="badge bg-accent/10 text-accent-glow border border-accent/18">{job.seniority}</span>}
               {sourceDomain && <span className="badge bg-white/[0.04] text-gray-400 border border-white/[0.06] font-mono">{sourceDomain}</span>}
