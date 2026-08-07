@@ -997,7 +997,7 @@ function JobCard({ job, onRemove, idx }) {
               {!job.salary && job.salary_min && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15 font-mono">R$ {Math.round(job.salary_min/1000)}k{job.salary_max?`-${Math.round(job.salary_max/1000)}k`:''}</span>}
               {job.seniority && <span className="badge bg-accent/10 text-accent-glow border border-accent/18">{job.seniority}</span>}
               {sourceDomain && <span className="badge bg-white/[0.04] text-gray-400 border border-white/[0.06] font-mono">{sourceDomain}</span>}
-              {job.id_vaga && <span className="badge bg-white/[0.04] text-gray-500 border border-white/[0.06] font-mono text-[10px]">#{job.id_vaga}</span>}
+              <span className="badge bg-white/[0.04] text-gray-500 border border-white/[0.06] font-mono text-[10px]">#{job.id_vaga||'?'}</span>
               {statusBadge && <span className={`badge border ${statusBadge.cls}`}><SvgIcon d={statusBadge.iconD} size={12}/> {statusBadge.label}</span>}
             </div>
             <h3 className="text-base lg:text-lg font-semibold text-white leading-snug mb-0.5 font-sans" style={{"textWrap":"balance"}}>
