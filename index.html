@@ -563,6 +563,7 @@ async function fetchJobs() {
         return true;
       })
       .map(row => ({
+        id_vaga: row.id_vaga,
         url: row.url,
         title: row.job_title || row.title || '',
         company: row.job_company || row.company || '',
