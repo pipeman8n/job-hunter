@@ -183,9 +183,6 @@ body{
 .btn-discard:hover{background:rgba(239,68,68,.1);box-shadow:0 4px 12px rgba(239,68,68,.1)}
 .btn-expire{color:#94a3b8;border-color:rgba(100,116,139,.2)}
 .btn-expire:hover{background:rgba(100,116,139,.1)}
-.btn-apply{color:#818cf8;border-color:rgba(129,140,248,.2)}
-.btn-apply:hover{background:rgba(129,140,248,.12);box-shadow:0 4px 16px rgba(129,140,248,.15)}
-.btn-apply.active{background:rgba(129,140,248,.18);color:#a5b4fc;border-color:rgba(129,140,248,.35);box-shadow:0 0 20px rgba(129,140,248,.1)}
 .btn-block{color:#fbbf24;border-color:rgba(251,191,36,.2)}
 .btn-block:hover{background:rgba(251,191,36,.12);box-shadow:0 4px 16px rgba(251,191,36,.15)}
 .btn-block.active{background:rgba(251,191,36,.18);color:#fcd34d;border-color:rgba(251,191,36,.35);box-shadow:0 0 20px rgba(251,191,36,.1)}
@@ -356,6 +353,17 @@ async function saveToSupabase(url, status, notes) {
   } catch { return false; }
 }
 
+async function saveBlockReason(url, title, reason) {
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('job_blacklist').upsert({
+      url, reason: `Bloqueado: ${reason} — "${title.substring(0,100)}"`,
+      is_active: true, created_at: new Date().toISOString()
+    }, { onConflict: 'url' });
+    return !error;
+  } catch { return false; }
+}
+
 // ─── API ────────────────────────────────────────
 const API_BASE = '/api';
 async function apiCall(data) {
@@ -427,6 +435,47 @@ function ConfirmModal({ open, title, message, confirmLabel, confirmColor, iconD,
           <button onClick={onConfirm}
             className={`px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition duration-200 font-sans ${confirmColor==='danger'?'bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/25':'bg-accent hover:bg-blue-700 shadow-lg shadow-accent/25'}`}>
             {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BlockModal({ open, job, onConfirm, onCancel }) {
+  const [reason, setReason] = React.useState('');
+  if (!open) return null;
+  return (
+    <div className="modal-overlay" onClick={onCancel} role="dialog" aria-modal="true">
+      <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth:'440px'}}>
+        <div className="flex items-start gap-4 mb-4">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+            style={{background:'rgba(251,191,36,.14)'}}>
+            <SvgIcon d={ICONS.shield} size={22} style={{color:'#fbbf24'}}/>
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white mb-1" style={{fontFamily:'var(--font-sans)'}}>Bloquear vaga</h3>
+            <p className="text-sm text-gray-400 leading-relaxed">Informe o motivo do bloqueio. O scraper usara isso para filtrar vagas similares.</p>
+          </div>
+        </div>
+        <textarea
+          value={reason}
+          onChange={e => setReason(e.target.value)}
+          placeholder="Ex: cargo fora do perfil BPM/automacao, consultoria, supply chain..."
+          className="w-full bg-white/[0.03] border border-gray-700/60 rounded-xl p-3 text-sm text-white placeholder-gray-600 resize-none focus:outline-none focus:border-accent/40 mb-4 font-sans"
+          rows={3}
+          autoFocus
+        />
+        <div className="flex gap-3 justify-end">
+          <button onClick={onCancel}
+            className="px-5 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white border border-gray-700/60 hover:border-gray-500 transition-colors duration-200 font-sans"
+            style={{background:'rgba(255,255,255,.02)',backdropFilter:'blur(6px)'}}>
+            Cancelar
+          </button>
+          <button onClick={() => { if (reason.trim()) { onConfirm(reason); setReason(''); } }}
+            disabled={!reason.trim()}
+            className={`px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition duration-200 font-sans ${reason.trim() ? 'bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-500/25' : 'bg-gray-700 cursor-not-allowed'}`}>
+            Bloquear
           </button>
         </div>
       </div>
@@ -731,7 +780,6 @@ function ChartSection({ jobs }) {
 function QuickFilters({ filters, setFilters, jobs }) {
   const counts = {
     favorita: jobs.filter(j=>j._status==='favorita').length,
-    inscrito: jobs.filter(j=>j._status==='inscrito').length,
     descartada: jobs.filter(j=>j._status==='descartada').length,
     expirada: jobs.filter(j=>j._status==='expirada').length,
     todas: jobs.length,
@@ -847,7 +895,7 @@ function JobCard({ job, onRemove, idx }) {
   const staggerDelay = `${0.06 * (idx || 0)}s`;
 
   const handleAction = async (newStatus) => {
-    if (newStatus === 'discard' || newStatus === 'expire') {
+    if (newStatus === 'discard' || newStatus === 'expire' || newStatus === 'block') {
       setModal(newStatus);
       return;
     }
@@ -910,6 +958,16 @@ function JobCard({ job, onRemove, idx }) {
         message={`"${job.title?.substring(0,70)}…" sera marcada como expirada e removida.`}
         confirmLabel="Sim, expirar" confirmColor="danger" iconD={ICONS.clock}
         onConfirm={() => applyStatus('expirada')} onCancel={() => setModal(null)} />
+
+      <BlockModal open={modal==='block'} job={job}
+        onConfirm={async (reason) => {
+          await saveBlockReason(job.url, job.title, reason);
+          await saveToSupabase(job.url, 'blocked', `Motivo: ${reason}`);
+          addToast('Vaga bloqueada. Motivo registrado.', 'success');
+          setHiding(true);
+          setTimeout(() => onRemove(job.url), 350);
+        }}
+        onCancel={() => setModal(null)} />
 
       <div className={`glass-card p-5 ${hiding?'job-hidden':''}`}
         style={{animation: `cardStaggerIn .5s ${staggerDelay} var(--easing) both`}}>
@@ -1018,7 +1076,6 @@ function JobCard({ job, onRemove, idx }) {
             {expanded ? 'Menos detalhes' : 'Mais detalhes'}
           </button>
           <div className="flex gap-1.5 flex-wrap justify-end">
-            <button onClick={()=>handleAction('inscrito')} className={} aria-label={status==='inscrito'?'Inscrito':'Inscrever-se na vaga'}><SvgIcon d={ICONS.check} size={13}/> {status==='inscrito'?'Inscrito':'Inscrever'}</button>
             <button onClick={()=>handleAction('favorita')} className={`action-btn btn-fav ${status==='favorita'?'active':''}`} aria-label={status==='favorita'?'Remover dos favoritos':'Favoritar vaga'}><SvgIcon d={ICONS.star} size={13}/> Favoritar</button>
             <button onClick={()=>handleAction('block')} className="action-btn btn-block" aria-label="Bloquear vaga"><SvgIcon d={ICONS.shield} size={13}/> Bloquear</button>
             <button onClick={()=>handleAction('discard')} className="action-btn btn-discard" aria-label="Descartar vaga"><SvgIcon d={ICONS.trash} size={13}/> Descartar</button>
