@@ -1,0 +1,23 @@
+# Arquivos de Configuração e Segredos
+.env
+*.env
+config.json
+credentials/
+
+# Python / Ambientes Virtuais
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Logs e Backups
+*.log
+*.bak
+index.html.bak.*
+
+# Configurações de IDE
+.vscode/
+.idea/
+
+# Dependências geradas
+node_modules/
