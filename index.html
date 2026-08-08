@@ -560,6 +560,11 @@ async function fetchJobs() {
         if (/estoquista|almoxarif|expedi[çc][aã]o/i.test(t)) return false;
         const loc = (row.location || '').toLowerCase();
         if (loc && !/sp|s[aã]o paulo|remoto|home office|híbrido|hibrido|brasil|brazil/i.test(loc)) return false;
+        // Auto-fix blacklist 08/08
+        if (/tesouraria/i.test(t)) return false;
+        if (/administra[çc][aã]o\s+(de\s+)?pessoal/i.test(t)) return false;
+        if (/people\s*analytics/i.test(t)) return false;
+        if (/analista\s+adm\b/i.test(t)) return false;
         return true;
       })
       .map(row => ({
