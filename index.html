@@ -565,6 +565,11 @@ async function fetchJobs() {
         if (/administra[çc][aã]o\s+(de\s+)?pessoal/i.test(t)) return false;
         if (/people\s*analytics/i.test(t)) return false;
         if (/analista\s+adm\b/i.test(t)) return false;
+        // Auto-fix blacklist 08/08 #2
+        if (/\btransporte\b|transportes/i.test(t)) return false;
+        if (/\bcobran[çc]a\b/i.test(t)) return false;
+        if (/\batendimento\b/i.test(t)) return false;
+        if (/\bpmo\b/i.test(t)) return false;
         return true;
       })
       .map(row => ({
