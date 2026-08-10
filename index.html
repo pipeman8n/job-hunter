@@ -570,6 +570,13 @@ async function fetchJobs() {
         if (/\bcobran[çc]a\b/i.test(t)) return false;
         if (/\batendimento\b/i.test(t)) return false;
         if (/\bpmo\b/i.test(t)) return false;
+        // Auto-fix blacklist 08/10
+        if (/recupera[çc][aã]o\s+(de\s+)?cr[ée]dito/i.test(t)) return false;
+        if (/analista\s+(de\s+)?sistemas|vibecoding/i.test(t)) return false;
+        if (/consultor[ae]?\s+comercial/i.test(t)) return false;
+        if (/analista\s+financeir[oa]\b/i.test(t)) return false;
+        if (/im[oó]ve[iî]s|corretor\s+(de\s+)?im[oó]vei[sî]|corretor\s+imobili[aá]rio/i.test(t)) return false;
+        if (/beleza|dermoconsultor|est[ée]tic[ao]/i.test(t)) return false;
         return true;
       })
       .map(row => ({
