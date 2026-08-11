@@ -559,6 +559,8 @@ async function fetchJobs() {
         if (/deloitte|pwc\b|accenture|avanade|kpmg|ernst|ey\b/i.test(t)) return false;
         if (/estoquista|almoxarif|expedi[çc][aã]o/i.test(t)) return false;
         if (/analista\s+fiscal|fiscal\s+(pleno|sr|senior|junior)/i.test(t)) return false;
+        if (/analista\s+cont[aá]bil|cont[aá]bil\b/i.test(t)) return false;
+        if (/\bPCM\b|analista\s+(de\s+)?pcm/i.test(t)) return false;
         const loc = (row.location || '').toLowerCase();
         if (loc && !/sp|s[aã]o paulo|remoto|home office|híbrido|hibrido|brasil|brazil/i.test(loc)) return false;
         // Auto-fix blacklist 08/08
