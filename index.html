@@ -581,6 +581,10 @@ async function fetchJobs() {
         if (/analista\s+financeir[oa]\b/i.test(t)) return false;
         if (/im[oó]ve[iî]s|corretor\s+(de\s+)?im[oó]vei[sî]|corretor\s+imobili[aá]rio/i.test(t)) return false;
         if (/beleza|dermoconsultor|est[ée]tic[ao]/i.test(t)) return false;
+        // Auto-fix blacklist 08/13
+        if (/\bsocial\b/i.test(t)) return false;
+        if (/\bcustomer\b/i.test(t)) return false;
+        if (/desenvolvedor[ae]?\s+(de\s+)?sistemas/i.test(t)) return false;
         return true;
       })
       .map(row => ({
