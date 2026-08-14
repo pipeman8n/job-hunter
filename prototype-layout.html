@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Headhunter Preditivo — Protótipo de Layout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#020617; --panel:#0b1120; --card:#0e1626;
+    --border:#1e293b; --border-soft:#16203a;
+    --text:#e2e8f0; --muted:#94a3b8; --faint:#64748b;
+    --blue:#2563eb; --blue-soft:rgba(37,99,235,.14);
+    --amber:#f59e0b; --amber-soft:rgba(245,158,11,.13);
+    --green:#10b981; --green-soft:rgba(16,185,129,.13);
+    --red:#ef4444;
+    --indigo:#818cf8;
+    --font:'Fira Sans',system-ui,sans-serif;
+    --mono:'Fira Code',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  /* ===== TOPBAR (sticky, compacta) ===== */
+  .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:16px;
+    padding:0 20px;height:56px;background:rgba(2,6,23,.82);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border-soft)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;letter-spacing:-.02em;white-space:nowrap}
+  .brand .mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--blue),#1d4ed8);
+    display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:600;color:#fff}
+  .brand .sub{font-size:10px;font-weight:500;color:var(--faint);font-family:var(--mono);margin-top:1px}
+  .search{flex:1;max-width:420px;display:flex;align-items:center;gap:8px;height:34px;
+    padding:0 12px;border-radius:9px;background:var(--panel);border:1px solid var(--border-soft)}
+  .search input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--font)}
+  .search input::placeholder{color:var(--faint)}
+  .search svg{flex:none;opacity:.5}
+  .top-chips{display:flex;gap:6px;margin-left:auto;overflow-x:auto}
+  .chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;
+    font-size:12px;font-weight:600;color:var(--muted);background:transparent;border:1px solid var(--border);
+    cursor:pointer;white-space:nowrap;transition:.15s}
+  .chip .n{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .chip:hover{color:var(--text);border-color:#334155}
+  .chip.active{color:#fff;background:var(--blue-soft);border-color:rgba(37,99,235,.5)}
+  .chip.active .n{color:#93c5fd}
+  .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--green);font-family:var(--mono);white-space:nowrap}
+  .live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+
+  /* ===== LAYOUT: sidebar + main ===== */
+  .layout{display:grid;grid-template-columns:232px 1fr;gap:0;min-height:calc(100vh - 56px)}
+  .sidebar{border-right:1px solid var(--border-soft);padding:20px 14px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+  .side-group{margin-bottom:22px}
+  .side-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--faint);margin-bottom:10px;font-family:var(--mono)}
+  .side-item{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;
+    padding:8px 10px;border-radius:8px;font-size:13px;color:var(--muted);background:none;border:none;cursor:pointer;transition:.12s}
+  .side-item:hover{background:rgba(255,255,255,.03);color:var(--text)}
+  .side-item.active{background:var(--blue-soft);color:#dbeafe;font-weight:600}
+  .side-item .count{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .side-item.active .count{color:#93c5fd}
+  .sort-select{width:100%;height:34px;border-radius:8px;background:var(--panel);border:1px solid var(--border-soft);
+    color:var(--text);font-size:12px;padding:0 10px;font-family:var(--font);outline:none}
+
+  .main{padding:20px 22px;max-width:1280px}
+
+  /* ===== KPI ===== */
+  .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+  .kpi{background:var(--card);border:1px solid var(--border-soft);border-radius:12px;padding:14px 16px}
+  .kpi .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);font-family:var(--mono);margin-bottom:8px}
+  .kpi .value{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .kpi .value small{font-size:13px;font-weight:600;color:var(--muted);margin-left:2px}
+  .kpi .delta{font-size:11px;font-weight:600;margin-top:6px}
+  .kpi .delta.up{color:var(--green)} .kpi .delta.down{color:var(--amber)}
+
+  /* ===== CHARTS ===== */
+  .charts{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:18px}
+  .panel{background:var(--card);border:1px solid var(--border-soft);border-radius:12px;padding:16px}
+  .panel h3{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:14px;letter-spacing:.02em}
+  .bars{display:flex;flex-direction:column;gap:9px}
+  .bar-row{display:grid;grid-template-columns:130px 1fr 34px;align-items:center;gap:10px}
+  .bar-row .lbl{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar-track{height:8px;border-radius:4px;background:rgba(255,255,255,.04);overflow:hidden}
+  .bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--blue),#60a5fa)}
+  .bar-row .val{font-family:var(--mono);font-size:11px;color:var(--text);text-align:right}
+  .donut-wrap{display:flex;align-items:center;gap:18px}
+  .donut{width:110px;height:110px;border-radius:50%;flex:none;
+    background:conic-gradient(var(--blue) 0 46%,var(--green) 46% 74%,var(--amber) 74% 100%)}
+  .donut-hole{width:110px;height:110px;border-radius:50%;background:var(--card);display:grid;place-items:center}
+  .donut-inner{width:72px;height:72px;border-radius:50%;background:var(--card);border:1px solid var(--border-soft);display:grid;place-items:center;text-align:center}
+  .legend{display:flex;flex-direction:column;gap:8px}
+  .leg{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+  .leg .sw{width:9px;height:9px;border-radius:3px;flex:none}
+
+  /* ===== JOB CARDS ===== */
+  .jobs-head{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
+  .jobs-head h2{font-size:14px;font-weight:700;color:var(--text)}
+  .jobs-head .count{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .jobs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .job{background:var(--card);border:1px solid var(--border-soft);border-radius:14px;padding:16px;transition:.15s;display:flex;flex-direction:column;gap:10px}
+  .job:hover{border-color:#334155;transform:translateY(-1px)}
+  .job-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .job-title{font-size:14px;font-weight:700;line-height:1.3;letter-spacing:-.01em}
+  .job-company{font-size:12px;color:var(--muted);margin-top:2px}
+  .fit{flex:none;text-align:center}
+  .fit .score{font-size:22px;font-weight:800;font-family:var(--mono);line-height:1}
+  .fit .verdict{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+  .v-strong{color:var(--green)} .v-good{color:#34d399} .v-mod{color:var(--amber)} .v-weak{color:var(--red)}
+  .badges{display:flex;flex-wrap:wrap;gap:5px}
+  .badge{font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;font-family:var(--mono)}
+  .b-salary{background:var(--green-soft);color:#6ee7b7;border:1px solid rgba(16,185,129,.2)}
+  .b-model{background:var(--blue-soft);color:#93c5fd;border:1px solid rgba(37,99,235,.2)}
+  .b-senior{background:var(--amber-soft);color:#fcd34d;border:1px solid rgba(245,158,11,.2)}
+  .b-stack{background:rgba(129,140,248,.12);color:#c7d2fe;border:1px solid rgba(129,140,248,.2)}
+  .b-arch{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border)}
+  .dims{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border-top:1px solid var(--border-soft);padding-top:10px}
+  .dim{display:flex;flex-direction:column;gap:4px}
+  .dim .dl{font-size:9px;color:var(--faint);font-family:var(--mono)}
+  .dim .dv{font-size:12px;font-weight:700;font-family:var(--mono)}
+  .dim .db{height:3px;border-radius:2px;background:rgba(255,255,255,.05);overflow:hidden}
+  .dim .db i{display:block;height:100%;border-radius:2px;background:var(--dimc,var(--blue))}
+  .job-actions{display:flex;gap:6px;border-top:1px solid var(--border-soft);padding-top:10px}
+  .act{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;height:30px;
+    border-radius:8px;font-size:11px;font-weight:600;color:var(--muted);background:none;border:1px solid var(--border);cursor:pointer;transition:.13s}
+  .act:hover{color:var(--text);border-color:#334155}
+  .act.fav:hover{color:#fcd34d;border-color:rgba(245,158,11,.4)}
+  .act.apply:hover{color:#c7d2fe;border-color:rgba(129,140,248,.4)}
+  .act.discard:hover{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+  .summary{font-size:11.5px;color:var(--muted);line-height:1.5}
+
+  .footer{border-top:1px solid var(--border-soft);margin-top:24px;padding:16px 0;display:flex;justify-content:space-between;align-items:center}
+  .footer .t{font-family:var(--mono);font-size:10px;color:var(--faint)}
+
+  @media(max-width:1024px){.layout{grid-template-columns:1fr}.sidebar{display:none}.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.jobs-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <div class="mark">JH</div>
+    <div>
+      <div>Headhunter Preditivo</div>
+      <div class="sub">v12-proto · layout</div>
+    </div>
+  </div>
+  <div class="search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input placeholder="Buscar por título ou empresa...">
+  </div>
+  <div class="top-chips">
+    <button class="chip active">Todas <span class="n">42</span></button>
+    <button class="chip">Favoritas <span class="n">7</span></button>
+    <button class="chip">Inscrito <span class="n">3</span></button>
+    <button class="chip">Descartadas <span class="n">11</span></button>
+  </div>
+  <span class="live"><span class="dot"></span>pipeline ativo</span>
+</header>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="side-group">
+      <div class="side-title">Status</div>
+      <button class="side-item active">Todas as vagas <span class="count">42</span></button>
+      <button class="side-item">Favoritas <span class="count">7</span></button>
+      <button class="side-item">Inscrito <span class="count">3</span></button>
+      <button class="side-item">Descartadas <span class="count">11</span></button>
+      <button class="side-item">Expiradas <span class="count">9</span></button>
+    </div>
+    <div class="side-group">
+      <div class="side-title">Categoria</div>
+      <button class="side-item active">Todas <span class="count">42</span></button>
+      <button class="side-item">Automação <span class="count">18</span></button>
+      <button class="side-item">Processos <span class="count">14</span></button>
+      <button class="side-item">IA &amp; Agentes <span class="count">10</span></button>
+    </div>
+    <div class="side-group">
+      <div class="side-title">Modelo</div>
+      <button class="side-item">Remoto <span class="count">24</span></button>
+      <button class="side-item">Híbrido <span class="count">12</span></button>
+      <button class="side-item">Presencial SP <span class="count">6</span></button>
+    </div>
+    <div class="side-group">
+      <div class="side-title">Ordenar por</div>
+      <select class="sort-select">
+        <option>Match AI (maior)</option>
+        <option>Salário (maior)</option>
+        <option>Mais recentes</option>
+      </select>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- KPI -->
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Total de vagas</div><div class="value">42</div><div class="delta up">▲ +8 esta semana</div></div>
+      <div class="kpi"><div class="label">Match médio</div><div class="value">71<small>%</small></div><div class="delta up">▲ +3 pts</div></div>
+      <div class="kpi"><div class="label">Remotas / Híbridas</div><div class="value">36</div><div class="delta up">86% do total</div></div>
+      <div class="kpi"><div class="label">Salário médio</div><div class="value">R$ 15.4<small>k</small></div><div class="delta up">▲ R$ 900</div></div>
+      <div class="kpi"><div class="label">Senioridade top</div><div class="value">Sênior</div><div class="delta down">31 vagas</div></div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts">
+      <div class="panel">
+        <h3>Vagas por categoria</h3>
+        <div class="bars">
+          <div class="bar-row"><span class="lbl">Automação &amp; Processos</span><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div><span class="val">18</span></div>
+          <div class="bar-row"><span class="lbl">Gestão de Processos</span><div class="bar-track"><div class="bar-fill" style="width:64%"></div></div><span class="val">14</span></div>
+          <div class="bar-row"><span class="lbl">IA &amp; Agentes</span><div class="bar-track"><div class="bar-fill" style="width:45%"></div></div><span class="val">10</span></div>
+          <div class="bar-row"><span class="lbl">Low-code / n8n</span><div class="bar-track"><div class="bar-fill" style="width:36%"></div></div><span class="val">8</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Modelo de trabalho</h3>
+        <div class="donut-wrap">
+          <div class="donut"><div class="donut-hole"><div class="donut-inner"><div style="font-size:18px;font-weight:800">42</div><div style="font-size:9px;color:var(--faint);font-family:var(--mono)">vagas</div></div></div></div>
+          <div class="legend">
+            <span class="leg"><span class="sw" style="background:var(--blue)"></span>Remoto · 24</span>
+            <span class="leg"><span class="sw" style="background:var(--green)"></span>Híbrido · 12</span>
+            <span class="leg"><span class="sw" style="background:var(--amber)"></span>Presencial · 6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOBS -->
+    <div class="jobs-head">
+      <h2>Vagas com melhor fit</h2>
+      <span class="count">42 resultados · ordenado por Match AI</span>
+    </div>
+    <div class="jobs-grid">
+
+      <div class="job">
+        <div class="job-top">
+          <div>
+            <div class="job-title">Coordenador de Automação RPA</div>
+            <div class="job-company">Zurich Seguros · São Paulo</div>
+          </div>
+          <div class="fit"><div class="score" style="color:#34d399">88</div><div class="verdict v-strong">Strong Fit</div></div>
+        </div>
+        <div class="badges">
+          <span class="badge b-salary">R$ 21.000</span>
+          <span class="badge b-model">remoto</span>
+          <span class="badge b-senior">sênior</span>
+          <span class="badge b-stack">UiPath · Python</span>
+          <span class="badge b-arch">Agentic</span>
+        </div>
+        <p class="summary">Liderar esteira RPA e automação de processos com foco em redução de tempo de ciclo em sinistros.</p>
+        <div class="dims">
+          <div class="dim"><span class="dl">TECH</span><span class="dv">92</span><div class="db"><i style="width:92%;--dimc:#34d399"></i></div></div>
+          <div class="dim"><span class="dl">EXP</span><span class="dv">85</span><div class="db"><i style="width:85%;--dimc:#34d399"></i></div></div>
+          <div class="dim"><span class="dl">CULT</span><span class="dv">78</span><div class="db"><i style="width:78%;--dimc:#a3e635"></i></div></div>
+          <div class="dim"><span class="dl">ALINH</span><span class="dv">90</span><div class="db"><i style="width:90%;--dimc:#34d399"></i></div></div>
+        </div>
+        <div class="job-actions">
+          <button class="act fav">★ Favoritar</button>
+          <button class="act apply">✓ Inscrito</button>
+          <button class="act">↗ Abrir</button>
+          <button class="act discard">✕ Descartar</button>
+        </div>
+      </div>
+
+      <div class="job">
+        <div class="job-top">
+          <div>
+            <div class="job-title">Analista de Processos e Automação</div>
+            <div class="job-company">Itaú Unibanco · remoto</div>
+          </div>
+          <div class="fit"><div class="score" style="color:#34d399">82</div><div class="verdict v-strong">Strong Fit</div></div>
+        </div>
+        <div class="badges">
+          <span class="badge b-salary">R$ 14.000</span>
+          <span class="badge b-model">remoto</span>
+          <span class="badge b-senior">sênior</span>
+          <span class="badge b-stack">n8n · Python · Pipefy</span>
+          <span class="badge b-arch">Automação</span>
+        </div>
+        <p class="summary">Mapear processos e construir automações com n8n para a vertical de operações.</p>
+        <div class="dims">
+          <div class="dim"><span class="dl">TECH</span><span class="dv">85</span><div class="db"><i style="width:85%;--dimc:#34d399"></i></div></div>
+          <div class="dim"><span class="dl">EXP</span><span class="dv">80</span><div class="db"><i style="width:80%;--dimc:#34d399"></i></div></div>
+          <div class="dim"><span class="dl">CULT</span><span class="dv">72</span><div class="db"><i style="width:72%;--dimc:#a3e635"></i></div></div>
+          <div class="dim"><span class="dl">ALINH</span><span class="dv">84</span><div class="db"><i style="width:84%;--dimc:#34d399"></i></div></div>
+        </div>
+        <div class="job-actions">
+          <button class="act fav">★ Favoritar</button>
+          <button class="act apply">✓ Inscrito</button>
+          <button class="act">↗ Abrir</button>
+          <button class="act discard">✕ Descartar</button>
+        </div>
+      </div>
+
+      <div class="job">
+        <div class="job-top">
+          <div>
+            <div class="job-title">Consultor de Automação de Processos</div>
+            <div class="job-company">Deloitte · híbrido</div>
+          </div>
+          <div class="fit"><div class="score" style="color:#34d399">74</div><div class="verdict v-good">Good Fit</div></div>
+        </div>
+        <div class="badges">
+          <span class="badge b-salary">R$ 18.000</span>
+          <span class="badge b-model">híbrido</span>
+          <span class="badge b-senior">sênior</span>
+          <span class="badge b-stack">n8n · BPMN</span>
+          <span class="badge b-arch">Automação</span>
+        </div>
+        <p class="summary">Consultoria em transformação de processos para clientes financeiros, com entrega de automações.</p>
+        <div class="dims">
+          <div class="dim"><span class="dl">TECH</span><span class="dv">72</span><div class="db"><i style="width:72%;--dimc:#34d399"></i></div></div>
+          <div class="dim"><span class="dl">EXP</span><span class="dv">78</span><div class="db"><i style="width:78%;--dimc:#34d399"></i></div></div>
+          <div class="dim"><span class="dl">CULT</span><span class="dv">65</span><div class="db"><i style="width:65%;--dimc:#a3e635"></i></div></div>
+          <div class="dim"><span class="dl">ALINH</span><span class="dv">76</span><div class="db"><i style="width:76%;--dimc:#34d399"></i></div></div>
+        </div>
+        <div class="job-actions">
+          <button class="act fav">★ Favoritar</button>
+          <button class="act apply">✓ Inscrito</button>
+          <button class="act">↗ Abrir</button>
+          <button class="act discard">✕ Descartar</button>
+        </div>
+      </div>
+
+      <div class="job">
+        <div class="job-top">
+          <div>
+            <div class="job-title">Especialista BPM</div>
+            <div class="job-company">SulAmérica · São Paulo (presencial)</div>
+          </div>
+          <div class="fit"><div class="score" style="color:#fbbf24">68</div><div class="verdict v-mod">Moderate Fit</div></div>
+        </div>
+        <div class="badges">
+          <span class="badge b-salary">R$ 16.500</span>
+          <span class="badge b-model">presencial SP</span>
+          <span class="badge b-senior">sênior</span>
+          <span class="badge b-stack">Bizagi · Pipefy</span>
+          <span class="badge b-arch">Processos</span>
+        </div>
+        <p class="summary">Modelagem AS-IS/TO-BE e gestão de indicadores de processos na vertical vida e previdência.</p>
+        <div class="dims">
+          <div class="dim"><span class="dl">TECH</span><span class="dv">62</span><div class="db"><i style="width:62%;--dimc:#fbbf24"></i></div></div>
+          <div class="dim"><span class="dl">EXP</span><span class="dv">80</span><div class="db"><i style="width:80%;--dimc:#34d399"></i></div></div>
+          <div class="dim"><span class="dl">CULT</span><span class="dv">68</span><div class="db"><i style="width:68%;--dimc:#a3e635"></i></div></div>
+          <div class="dim"><span class="dl">ALINH</span><span class="dv">60</span><div class="db"><i style="width:60%;--dimc:#fbbf24"></i></div></div>
+        </div>
+        <div class="job-actions">
+          <button class="act fav">★ Favoritar</button>
+          <button class="act apply">✓ Inscrito</button>
+          <button class="act">↗ Abrir</button>
+          <button class="act discard">✕ Descartar</button>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      <span class="t">Job Hunter · protótipo de layout (não implantado)</span>
+      <span class="t">Design: Financial Dark · blue/amber · Fira</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+  // interação mínima para demonstrar o filtro de status
+  document.querySelectorAll('.top-chips .chip').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.top-chips .chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.side-item').forEach(i => {
+    i.addEventListener('click', () => {
+      i.parentElement.querySelectorAll('.side-item').forEach(x => x.classList.remove('active'));
+      i.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

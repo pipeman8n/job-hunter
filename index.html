@@ -291,6 +291,62 @@ button,a,select,.glass-card,.kpi-card,[role="button"]{cursor:pointer}
 
 /* ── Inline SVG icon defaults ── */
 .icon-svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ── v3 List Layout ── */
+.topbar-v3{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;padding:0 20px;height:56px;background:rgba(2,6,23,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(51,65,85,.25)}
+.brand-v3{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;letter-spacing:-.02em;white-space:nowrap}
+.brand-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#1E40AF,#1d4ed8);display:grid;place-items:center;font-family:var(--font-mono);font-size:12px;font-weight:600;color:#fff;flex:none}
+.search-v3{flex:1;max-width:420px;display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:9px;background:rgba(11,17,32,.8);border:1px solid rgba(51,65,85,.25)}
+.search-v3 input{flex:1;background:none;border:none;outline:none;color:#e2e8f0;font-size:13px;font-family:var(--font-sans)}
+.search-v3 input::placeholder{color:#64748b}
+.chip-v3{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;font-size:12px;font-weight:600;color:#94a3b8;background:transparent;border:1px solid rgba(51,65,85,.4);cursor:pointer;white-space:nowrap;transition:.15s}
+.chip-v3:hover{color:#e2e8f0;border-color:#64748b}
+.chip-v3.active{color:#fff;background:rgba(30,64,175,.2);border-color:rgba(59,130,246,.5)}
+.app-shell{display:grid;grid-template-columns:232px 1fr;min-height:calc(100vh - 56px)}
+.sidebar-v3{border-right:1px solid rgba(51,65,85,.2);padding:16px 14px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.side-title-v3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#64748b;margin:16px 0 8px;font-family:var(--font-mono)}
+.side-title-v3:first-child{margin-top:0}
+.side-item-v3{display:flex;align-items:center;justify-content:space-between;width:100%;padding:8px 10px;border-radius:8px;font-size:13px;color:#94a3b8;background:none;border:none;cursor:pointer;transition:.12s;text-align:left;font-family:var(--font-sans)}
+.side-item-v3:hover{background:rgba(255,255,255,.04);color:#e2e8f0}
+.side-item-v3.active{background:rgba(30,64,175,.16);color:#dbeafe;font-weight:600}
+.side-count{font-family:var(--font-mono);font-size:11px;color:#64748b}
+.side-item-v3.active .side-count{color:#93c5fd}
+.main-v3{padding:20px 22px;max-width:1380px}
+.list-wrap{border:1px solid rgba(51,65,85,.25);border-radius:12px;overflow:hidden;background:#0e1626}
+.list-head{display:grid;grid-template-columns:minmax(240px,1.8fr) 96px 1.15fr 150px 1fr;gap:12px;align-items:center;padding:8px 14px;background:rgba(11,17,32,.6);border-bottom:1px solid rgba(51,65,85,.4)}
+.list-head-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#64748b;font-family:var(--font-mono)}
+.list-head-label.right{text-align:right}
+.job-row{display:grid;grid-template-columns:minmax(240px,1.8fr) 96px 1.15fr 150px 1fr;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(51,65,85,.2);position:relative;cursor:pointer;transition:background .12s;animation:cardStaggerIn .4s var(--easing) both}
+.job-row:last-child{border-bottom:none}
+.job-row:hover{background:rgba(30,64,175,.05)}
+.job-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--row-accent,transparent)}
+.job-row[data-fit="strong"]{--row-accent:#10b981}
+.job-row[data-fit="good"]{--row-accent:#34d399}
+.job-row[data-fit="moderate"]{--row-accent:#f59e0b}
+.job-row[data-fit="weak"]{--row-accent:#ef4444}
+.job-actions-v3{display:flex;gap:4px;justify-content:flex-end;align-items:center;opacity:0;transition:opacity .15s}
+.job-row:hover .job-actions-v3{opacity:1}
+.act-v3{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;font-size:13px;color:#94a3b8;background:none;border:1px solid rgba(51,65,85,.4);cursor:pointer;transition:.13s;flex:none}
+.act-v3:hover{color:#e2e8f0;border-color:#64748b}
+.act-v3.fav:hover{color:#fcd34d;border-color:rgba(245,158,11,.4)}
+.act-v3.apply:hover{color:#c7d2fe;border-color:rgba(129,140,248,.4)}
+.act-v3.discard:hover{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+.fit-dims{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:3px}
+.fit-dim{display:flex;flex-direction:column;gap:2px}
+.fit-dim .trk{height:4px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden}
+.fit-dim .trk i{display:block;height:100%;border-radius:2px}
+.fit-dim b{font-size:7.5px;font-weight:600;color:#64748b;font-family:var(--font-mono);text-align:center}
+.job-detail{padding:14px 18px 16px 22px;background:rgba(11,17,32,.5);border-bottom:1px solid rgba(51,65,85,.2);animation:fadeIn .2s ease}
+.job-detail .sum{font-size:12.5px;color:#94a3b8;line-height:1.55;max-width:70ch}
+.job-detail h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#64748b;font-family:var(--font-mono);margin-bottom:8px}
+.job-detail ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.job-detail li{font-size:12px;color:#e2e8f0;display:flex;gap:8px;align-items:flex-start}
+.job-detail li::before{content:'';flex:none;width:6px;height:6px;border-radius:50%;margin-top:5px;background:#10b981}
+.job-detail li.gap::before{background:#f59e0b}
+.row-chev{font-size:10px;color:#64748b;text-align:right;transition:transform .15s}
+.job-row.open .row-chev{transform:rotate(180deg)}
+@media(max-width:1024px){.app-shell{grid-template-columns:1fr}.sidebar-v3{display:none}.job-row,.list-head{grid-template-columns:1fr auto}.job-actions-v3{opacity:1}}
+@media(hover:none){.job-actions-v3{opacity:1}}
 </style>
 </head>
 <body>
@@ -332,6 +388,8 @@ const ICONS = {
   exclamation: 'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z',
   information: 'M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z',
 };
+
+ICONS.shield = 'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z';
 
 // ─── Debounce ────────────────────────────────────
 function useDebounce(value, delay=300) {
@@ -817,7 +875,8 @@ function ChartSection({ jobs }) {
 }
 
 // ─── Quick Filter Pills ─────────────────────────
-function QuickFilters({ filters, setFilters, jobs }) {
+// ─── Sidebar (filtros) ──────────────────────────
+function Sidebar({ filters, setFilters, jobs }) {
   const counts = {
     favorita: jobs.filter(j=>j._status==='favorita').length,
     inscrito: jobs.filter(j=>j._status==='inscrito').length,
@@ -825,117 +884,71 @@ function QuickFilters({ filters, setFilters, jobs }) {
     expirada: jobs.filter(j=>j._status==='expirada').length,
     todas: jobs.length,
   };
-
-  const pills = [
-    { label:'Favoritas', status:'favorita', count:counts.favorita, color:'rgba(245,158,11,.12)', textColor:'#fbbf24', iconD:ICONS.star },
-    { label:'Inscritas', status:'inscrito', count:counts.inscrito, color:'rgba(129,140,248,.12)', textColor:'#a5b4fc', iconD:ICONS.check },
-    { label:'Descartadas', status:'descartada', count:counts.descartada, color:'rgba(239,68,68,.1)', textColor:'#f87171', iconD:ICONS.trash },
-    { label:'Expiradas', status:'expirada', count:counts.expirada, color:'rgba(100,116,139,.1)', textColor:'#94a3b8', iconD:ICONS.clock },
-    { label:'Todas', status:'', count:counts.todas, color:'rgba(30,64,175,.1)', textColor:'#60a5fa', iconD:ICONS.document },
-  ];
-
-  return (
-    <div className="flex gap-2.5 mb-5 flex-wrap">
-      {pills.map(p => {
-        const active = p.status ? filters.status===p.status : !filters.status;
-        return (
-          <button key={p.status}
-            aria-label={`Filtrar por ${p.label} (${p.count} vagas)`}
-            onClick={() => setFilters({...filters, status: p.status===filters.status ? '' : p.status})}
-            style={active ? {
-              background: p.color,
-              border: `1px solid ${p.textColor}40`,
-              color: p.textColor,
-              boxShadow: active ? `0 4px 16px ${p.textColor}20` : 'none',
-            } : {
-              background: 'rgba(255,255,255,.02)',
-              border: '1px solid rgba(51,65,85,.2)',
-              color: '#9ca3af',
-            }}
-            className="px-4 py-2.5 rounded-xl text-xs font-semibold transition duration-200 flex items-center gap-2 backdrop-blur-sm hover:-translate-y-0.5 font-sans">
-            <SvgIcon d={p.iconD} size={14}/>
-            <span>{p.label}</span>
-            <span style={{
-              background: active ? `${p.textColor}25` : 'rgba(255,255,255,.06)',
-              color: active ? p.textColor : '#6b7280',
-            }} className="text-[10px] px-2 py-0.5 rounded-full font-bold font-mono">{p.count}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── Enhanced Filter Bar ────────────────────────
-function FilterBar({ jobs, filters, setFilters, searchRaw, setSearchRaw, visibleCount }) {
   const cats = [...new Set(jobs.map(j=>j.query_label).filter(Boolean))].sort();
   const models = [...new Set(jobs.map(j=>j.work_model).filter(Boolean))].sort();
 
+  const statusItems = [
+    { label:'Todas as vagas', status:'', count:counts.todas },
+    { label:'Favoritas', status:'favorita', count:counts.favorita },
+    { label:'Inscritas', status:'inscrito', count:counts.inscrito },
+    { label:'Descartadas', status:'descartada', count:counts.descartada },
+    { label:'Expiradas', status:'expirada', count:counts.expirada },
+  ];
+
   return (
-    <div className="glass-card p-4 mb-6 flex flex-wrap gap-3 items-center" style={{
-      background:'rgba(14,18,35,.55)',backdropFilter:'blur(20px)'
-    }}>
-      <div className="relative flex-1 min-w-[220px] max-w-[300px] search-glow">
-        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
-          <SvgIcon d={ICONS.search} size={16}/>
-        </span>
-        <input type="text" placeholder="Buscar cargo ou empresa…"
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-600 transition-colors duration-200 font-sans"
-          style={{backdropFilter:'blur(8px)'}} autoComplete="off" spellCheck="false"
-          aria-label="Buscar vagas por cargo ou empresa"
-          value={searchRaw} onChange={e=>setSearchRaw(e.target.value)} />
-      </div>
-      <select className="bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.05] font-sans"
-        style={{backdropFilter:'blur(8px)'}}
-        aria-label="Filtrar por categoria"
-        value={filters.category} onChange={e=>setFilters({...filters,category:e.target.value})}>
-        <option value="">Todas categorias</option>
-        {cats.map(c=><option key={c} value={c}>{c}</option>)}
-      </select>
-      <select className="bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.05] font-sans"
-        style={{backdropFilter:'blur(8px)'}}
-        aria-label="Filtrar por modelo de trabalho"
-        value={filters.model} onChange={e=>setFilters({...filters,model:e.target.value})}>
-        <option value="">Todos modelos</option>
-        {models.map(m=><option key={m} value={m}>{m}</option>)}
-      </select>
-      <select className="bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.05] font-sans"
-        style={{backdropFilter:'blur(8px)'}}
+    <div>
+      <div className="side-title-v3">Status</div>
+      {statusItems.map(s => {
+        const active = s.status ? filters.status===s.status : !filters.status;
+        return (
+          <button key={s.status} className={`side-item-v3 ${active?'active':''}`}
+            onClick={() => setFilters({...filters, status: s.status})}
+            aria-label={`Filtrar por ${s.label} (${s.count} vagas)`}>
+            <span>{s.label}</span><span className="side-count">{s.count}</span>
+          </button>
+        );
+      })}
+
+      <div className="side-title-v3">Categoria</div>
+      <button className={`side-item-v3 ${!filters.category?'active':''}`} onClick={()=>setFilters({...filters,category:''})}>
+        <span>Todas</span><span className="side-count">{jobs.length}</span>
+      </button>
+      {cats.map(c => (
+        <button key={c} className={`side-item-v3 ${filters.category===c?'active':''}`} onClick={()=>setFilters({...filters,category:c})}>
+          <span>{c}</span><span className="side-count">{jobs.filter(j=>j.query_label===c).length}</span>
+        </button>
+      ))}
+
+      <div className="side-title-v3">Modelo</div>
+      <button className={`side-item-v3 ${!filters.model?'active':''}`} onClick={()=>setFilters({...filters,model:''})}>
+        <span>Todos</span>
+      </button>
+      {models.map(m => (
+        <button key={m} className={`side-item-v3 ${filters.model===m?'active':''}`} onClick={()=>setFilters({...filters,model:m})}>
+          <span>{m}</span>
+        </button>
+      ))}
+
+      <div className="side-title-v3">Ordenar por</div>
+      <select value={filters.sort} onChange={e=>setFilters({...filters,sort:e.target.value})}
         aria-label="Ordenar vagas"
-        value={filters.sort} onChange={e=>setFilters({...filters,sort:e.target.value})}>
+        style={{width:'100%',height:34,borderRadius:8,background:'rgba(11,17,32,.8)',border:'1px solid rgba(51,65,85,.25)',color:'#e2e8f0',fontSize:12,padding:'0 10px',fontFamily:'var(--font-sans)',outline:'none',cursor:'pointer'}}>
         <option value="score">Melhor Match</option>
-        <option value="salary">Maior Salario</option>
+        <option value="salary">Maior Salário</option>
         <option value="recent">Mais Recentes</option>
       </select>
-      <select className="bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm text-white transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.05] font-sans"
-        style={{backdropFilter:'blur(8px)'}}
-        aria-label="Filtrar por status"
-        value={filters.status} onChange={e=>setFilters({...filters,status:e.target.value})}>
-        <option value="">Todos status</option>
-        <option value="pending">Pendentes</option>
-        <option value="favorita">Favoritas</option>
-        <option value="inscrito">Inscritas</option>
-        <option value="descartada">Descartadas</option>
-        <option value="expirada">Expiradas</option>
-      </select>
-      <span className="text-[11px] text-gray-500 ml-auto font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg font-mono"
-        style={{background:'rgba(30,64,175,.08)',border:'1px solid rgba(30,64,175,.12)'}}>
-        {visibleCount}<span className="text-gray-600">/{jobs.length}</span> vagas
-      </span>
     </div>
   );
 }
 
-// ─── Job Card ───────────────────────────────────
-function JobCard({ job, onRemove, idx }) {
+// ─── Job Row (lista v3) ─────────────────────────
+function JobRow({ job, onRemove, idx }) {
   const addToast = useContext(ToastContext);
   const [status, setStatus] = useState(job._status || 'pending');
   const [expanded, setExpanded] = useState(false);
   const [modal, setModal] = useState(null);
   const [notes, setNotes] = useState(job._notes || '');
   const [hiding, setHiding] = useState(false);
-
-  const staggerDelay = `${0.06 * (idx || 0)}s`;
 
   const handleAction = async (newStatus) => {
     if (newStatus === 'discard' || newStatus === 'expire' || newStatus === 'block') {
@@ -974,21 +987,22 @@ function JobCard({ job, onRemove, idx }) {
     }
   };
 
-  const score = job.score || 0;
-  const scColor = score >= 70 ? '#34d399' : score >= 40 ? '#FBBF24' : '#94a3b8';
-  const scBg = score >= 70 ? 'rgba(16,185,129,.12)' : score >= 40 ? 'rgba(217,119,6,.12)' : 'rgba(100,116,139,.1)';
-  const scBorder = score >= 70 ? 'rgba(16,185,129,.25)' : score >= 40 ? 'rgba(217,119,6,.2)' : 'rgba(100,116,139,.15)';
-  const sourceDomain = (() => { try { return new URL(job.url).hostname.replace('www.',''); } catch { return ''; } })();
-
-  const wm = (job.work_model||'').toLowerCase();
-  const isRemote = wm.includes('remoto')||wm.includes('remote');
-  const isHybrid = wm.includes('híbr')||wm.includes('hybrid');
-
-  const statusBadge = status==='favorita'?{label:'Favorita',cls:'bg-amber-500/12 text-amber-400 border-amber-500/18',iconD:ICONS.star}
-    :status==='inscrito'?{label:'Inscrito',cls:'bg-indigo-500/12 text-indigo-400 border-indigo-500/18',iconD:ICONS.check}
-    :status==='descartada'?{label:'Descartada',cls:'bg-red-500/12 text-red-400 border-red-500/18',iconD:ICONS.trash}
-    :status==='expirada'?{label:'Expirada',cls:'bg-slate-500/12 text-slate-400 border-slate-500/18',iconD:ICONS.clock}
-    :null;
+  const score = job.fit_score || job.score || 0;
+  const fitTier = score >= 75 ? 'strong' : score >= 60 ? 'good' : score >= 45 ? 'moderate' : score >= 30 ? 'weak' : '';
+  const verdict = (job.ai_match && job.ai_match.verdict) || (score>=75?'Strong':score>=60?'Good':score>=45?'Moderate':score>=30?'Weak':'Poor');
+  const scColor = score >= 60 ? '#34d399' : score >= 30 ? '#fbbf24' : '#94a3b8';
+  const verdictColor = score >= 75 ? '#10b981' : score >= 60 ? '#34d399' : score >= 45 ? '#f59e0b' : '#ef4444';
+  const dims = [
+    ['T', job.ai_match && job.ai_match.tech_score, '#60a5fa'],
+    ['E', job.ai_match && job.ai_match.exp_score, '#34d399'],
+    ['C', job.ai_match && job.ai_match.cultura_score, '#fbbf24'],
+    ['A', job.ai_match && job.ai_match.alinhamento_score, '#c084fc'],
+  ];
+  let salary = '';
+  if (job.salary) salary = (job.salary.startsWith('R$')||job.salary.startsWith('R$ ')) ? job.salary : `R$ ${job.salary}`;
+  else if (job.salary_min) salary = `R$ ${Math.round(job.salary_min/1000)}k${job.salary_max?`-${Math.round(job.salary_max/1000)}k`:''}`;
+  const stack = (job.stack || []).slice(0, 2);
+  const stackMore = (job.stack || []).length - 2;
 
   return (
     <>
@@ -1014,139 +1028,84 @@ function JobCard({ job, onRemove, idx }) {
         }}
         onCancel={() => setModal(null)} />
 
-      <div className={`glass-card p-5 ${hiding?'job-hidden':''}`}
-        style={{animation: `cardStaggerIn .5s ${staggerDelay} var(--easing) both`}}>
-        {/* Header Row */}
-        <div className="flex items-start justify-between gap-4 mb-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1.5">
-              {job.ai_match && <span className="badge badge-ai">{job.ai_match.verdict || 'AI Match'}</span>}
-              {score>=70 ? <span className="badge badge-score-high">{score}%</span>
-                : score>=40 ? <span className="badge badge-score-mid">{score}%</span>
-                : score>0 ? <span className="badge bg-white/[0.04] text-gray-500 border border-white/[0.06] font-mono">{score}%</span>
-                : null}
-              {job.archetype && job.archetype!=='Outros' && <span className="badge bg-purple-500/10 text-purple-300 border border-purple-500/15">{job.archetype}</span>}
-              {job.legitimidade==='Suspicious' && <span className="badge bg-red-500/12 text-red-400 border border-red-500/20">Ghost: suspeita</span>}
-              {job.legitimidade==='Caution' && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15">Ghost: cautela</span>}
-              {job.is_live===false && <span className="badge bg-red-500/12 text-red-400 border border-red-500/20">Link morto</span>}
-              {isRemote && <span className="badge badge-remote">Remoto</span>}
-              {isHybrid && <span className="badge badge-hybrid">Hibrido</span>}
-              {!isRemote && !isHybrid && job.work_model && <span className="badge bg-white/[0.04] text-gray-400 border border-white/[0.06]">{job.work_model}</span>}
-              {job.salary && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15 font-mono">{(job.salary.startsWith('R$')||job.salary.startsWith('R$ '))?job.salary:`R$ ${job.salary}`}</span>}
-              {!job.salary && job.salary_min && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15 font-mono">R$ {Math.round(job.salary_min/1000)}k{job.salary_max?`-${Math.round(job.salary_max/1000)}k`:''}</span>}
-              {job.seniority && <span className="badge bg-accent/10 text-accent-glow border border-accent/18">{job.seniority}</span>}
-              {sourceDomain && <span className="badge bg-white/[0.04] text-gray-400 border border-white/[0.06] font-mono">{sourceDomain}</span>}
-              <span className="badge bg-white/[0.04] text-gray-500 border border-white/[0.06] font-mono text-[10px]">#{job.id_vaga||'?'}</span>
-              {statusBadge && <span className={`badge border ${statusBadge.cls}`}><SvgIcon d={statusBadge.iconD} size={12}/> {statusBadge.label}</span>}
-            </div>
-            <h3 className="text-base lg:text-lg font-semibold text-white leading-snug mb-0.5 font-sans" style={{"textWrap":"balance"}}>
-              <a href={job.url} target="_blank" rel="noopener"
-                className="hover:text-accent-glow transition-colors duration-200 decoration-accent/30 hover:underline underline-offset-2">
-                {job.title || 'Sem titulo'}
-              </a>
-            </h3>
-            <p className="text-xs text-gray-500 font-sans">{job.company || 'Empresa'}{job.location ? ` · ${job.location}` : ''}</p>
+      <div className={`job-row ${hiding?'job-hidden':''} ${expanded?'open':''}`} data-fit={fitTier}
+        onClick={(e) => { if (e.target.closest('button,a,textarea,select')) return; setExpanded(!expanded); }}>
+        {/* Vaga */}
+        <div style={{minWidth:0}}>
+          <div style={{fontSize:'13.5px',fontWeight:700,lineHeight:1.3,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+            <a href={job.url} target="_blank" rel="noopener noreferrer" style={{color:'inherit'}} onClick={e=>e.stopPropagation()}>{job.title || 'Sem titulo'}</a>
           </div>
-          {/* Score ring */}
-          <div className="shrink-0 text-center">
-            <div className="score-ring" style={{background:scBg, borderColor:scBorder}}>
-              <span className="text-xl font-extrabold font-mono" style={{color:scColor}}>{score}</span>
-              <span className="text-[9px] text-gray-500 font-semibold -mt-1 font-mono">%</span>
-            </div>
-            <div className="text-[9px] text-gray-600 mt-1 font-medium tracking-wider uppercase font-mono">match</div>
+          <div style={{fontSize:'11.5px',color:'#94a3b8',marginTop:2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+            {job.company || 'Empresa'}{job.location ? ` · ${job.location}` : ''}
           </div>
         </div>
 
-        {/* Expanded Details */}
-        {expanded && (
-          <div className="mt-4 pt-4 border-t border-white/[0.06] space-y-4">
-            {job.summary && <p className="text-xs text-gray-400 leading-relaxed font-sans">{job.summary}</p>}
-            {job.requirements?.length>0 && (
-              <div>
-                <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest font-sans">Requisitos</span>
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {job.requirements.slice(0,6).map((r,i) => (
-                    <span key={i} className="text-[11px] bg-white/[0.03] text-gray-400 px-3 py-1.5 rounded-lg border border-white/[0.05] font-sans">{r}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {job.stack?.length>0 && (
-              <div>
-                <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest font-sans">Stack</span>
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {job.stack.map((s,i) => (
-                    <span key={i} className="text-[11px] bg-accent/12 text-accent-glow px-3 py-1.5 rounded-lg border border-accent/18 font-mono">{s}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {job.ai_match && (
-              <div className="rounded-2xl p-5 border"
-                style={{background:'rgba(30,64,175,.04)', borderColor:'rgba(30,64,175,.12)'}}>
-                {(job.ai_match.tech_score!=null || job.ai_match.exp_score!=null || job.ai_match.cultura_score!=null || job.ai_match.alinhamento_score!=null) && (
-                  <div className="space-y-1.5 mb-4">
-                    {[['Tecnico', job.ai_match.tech_score, '#60a5fa'], ['Experiencia', job.ai_match.exp_score, '#34d399'], ['Cultura', job.ai_match.cultura_score, '#fbbf24'], ['Alinhamento', job.ai_match.alinhamento_score, '#c084fc']].map(([label, val, color]) => val!=null && (
-                      <div key={label} className="flex items-center gap-2">
-                        <span className="text-[10px] text-gray-500 w-20 shrink-0 font-sans">{label}</span>
-                        <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                          <div className="h-full rounded-full" style={{width:`${val}%`, background:color}}></div>
-                        </div>
-                        <span className="text-[10px] text-gray-400 w-7 text-right font-mono">{val}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px]">
-                  {job.ai_match.strengths?.length>0 && (
-                    <div>
-                      <span className="text-emerald-400 font-semibold text-[10px] uppercase tracking-widest font-sans">Forcas</span>
-                      <p className="text-gray-300 mt-1.5 leading-relaxed font-sans">{job.ai_match.strengths.slice(0,3).join(' · ')}</p>
-                    </div>
-                  )}
-                  {job.ai_match.gaps?.length>0 && (
-                    <div>
-                      <span className="text-red-400 font-semibold text-[10px] uppercase tracking-widest font-sans">Gaps</span>
-                      <p className="text-gray-300 mt-1.5 leading-relaxed font-sans">{job.ai_match.gaps.slice(0,2).join(' · ')}</p>
-                    </div>
-                  )}
-                </div>
-                {job.ai_match.recommendation && (
-                  <p className="text-[11px] text-gray-300 mt-4 italic border-t pt-4 font-sans"
-                    style={{borderColor:'rgba(30,64,175,.1)'}}>{job.ai_match.recommendation}</p>
-                )}
-              </div>
-            )}
-            <div>
-              <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest block mb-2 font-sans">Notas</label>
-              <textarea
-                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-xs text-white resize-none placeholder-gray-600 transition-colors duration-200 font-sans"
-                style={{backdropFilter:'blur(6px)'}}
-                aria-label="Anotações sobre esta vaga"
-                rows="2" value={notes}
-                onChange={e => setNotes(e.target.value)}
-                placeholder="Anotacoes sobre esta vaga…" />
-            </div>
-          </div>
-        )}
+        {/* Remuneração */}
+        <div style={{fontFamily:'var(--font-mono)',fontSize:13,fontWeight:600,color:'#6ee7b7',textAlign:'right',whiteSpace:'nowrap'}}>{salary || '—'}</div>
 
-        {/* Actions Row */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t" style={{borderColor:'rgba(255,255,255,.06)'}}>
-          <button onClick={() => setExpanded(!expanded)}
-            aria-label={expanded?'Mostrar menos detalhes':'Mostrar mais detalhes'}
-            className="text-[11px] text-gray-600 hover:text-gray-400 transition-colors font-medium flex items-center gap-1.5 font-sans">
-            <SvgIcon d={expanded?ICONS.chevronUp:ICONS.chevronDown} size={10}/>
-            {expanded ? 'Menos detalhes' : 'Mais detalhes'}
-          </button>
-          <div className="flex gap-1.5 flex-wrap justify-end">
-            <button onClick={()=>handleAction('inscrito')} className={`action-btn btn-apply ${status==='inscrito'?'active':''}`} aria-label={status==='inscrito'?'Inscrito':'Inscrever-se na vaga'}><SvgIcon d={ICONS.check} size={13}/> {status==='inscrito'?'Inscrito':'Inscrever'}</button>
-            <button onClick={()=>handleAction('favorita')} className={`action-btn btn-fav ${status==='favorita'?'active':''}`} aria-label={status==='favorita'?'Remover dos favoritos':'Favoritar vaga'}><SvgIcon d={ICONS.star} size={13}/> Favoritar</button>
-            <button onClick={()=>handleAction('block')} className="action-btn btn-block" aria-label="Bloquear vaga"><SvgIcon d={ICONS.shield} size={13}/> Bloquear</button>
-            <button onClick={()=>handleAction('discard')} className="action-btn btn-discard" aria-label="Descartar vaga"><SvgIcon d={ICONS.trash} size={13}/> Descartar</button>
-            <button onClick={()=>handleAction('expire')} className="action-btn btn-expire" aria-label="Marcar como expirada"><SvgIcon d={ICONS.clock} size={13}/> Expirar</button>
+        {/* Badges */}
+        <div style={{display:'flex',gap:5,overflow:'hidden',alignItems:'center'}}>
+          {job.work_model && <span className="badge" style={{background:'rgba(37,99,235,.14)',color:'#93c5fd',border:'1px solid rgba(37,99,235,.2)',fontFamily:'var(--font-mono)',fontSize:10.5,padding:'3px 8px',borderRadius:6,whiteSpace:'nowrap'}}>{job.work_model}</span>}
+          {job.seniority && <span className="badge" style={{background:'rgba(245,158,11,.13)',color:'#fcd34d',border:'1px solid rgba(245,158,11,.2)',fontFamily:'var(--font-mono)',fontSize:10.5,padding:'3px 8px',borderRadius:6,whiteSpace:'nowrap'}}>{job.seniority}</span>}
+          {stack.map(s => <span key={s} className="badge" style={{background:'rgba(129,140,248,.12)',color:'#c7d2fe',border:'1px solid rgba(129,140,248,.2)',fontFamily:'var(--font-mono)',fontSize:10.5,padding:'3px 8px',borderRadius:6,whiteSpace:'nowrap'}}>{s}</span>)}
+          {stackMore > 0 && <span className="badge" style={{background:'rgba(255,255,255,.04)',color:'#64748b',border:'1px solid rgba(51,65,85,.4)',fontFamily:'var(--font-mono)',fontSize:10.5,padding:'3px 8px',borderRadius:6,whiteSpace:'nowrap'}}>+{stackMore}</span>}
+          {job.is_live === false && <span className="badge" style={{background:'rgba(239,68,68,.12)',color:'#f87171',border:'1px solid rgba(239,68,68,.2)',fontFamily:'var(--font-mono)',fontSize:10.5,padding:'3px 8px',borderRadius:6,whiteSpace:'nowrap'}}>link morto</span>}
+        </div>
+
+        {/* Fit */}
+        <div>
+          <div style={{display:'flex',alignItems:'baseline',gap:6}}>
+            <span style={{fontSize:17,fontWeight:800,fontFamily:'var(--font-mono)',color:scColor,lineHeight:1}}>{score}</span>
+            <span style={{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.06em',color:verdictColor}}>{verdict}</span>
           </div>
+          <div className="fit-dims">
+            {dims.map(([l,v,c]) => (
+              <div key={l} className="fit-dim" title={`${l} ${v!=null?v:'—'}`}>
+                <div className="trk"><i style={{width:`${v!=null?v:0}%`,background:c}} /></div>
+                <b>{l}</b>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Ações */}
+        <div className="job-actions-v3">
+          <button className="act-v3 fav" title="Favoritar" aria-label="Favoritar vaga" onClick={(e)=>{e.stopPropagation();handleAction('favorita');}}><SvgIcon d={ICONS.star} size={13}/></button>
+          <button className="act-v3 apply" title="Inscrito" aria-label="Marcar como inscrito" onClick={(e)=>{e.stopPropagation();handleAction('inscrito');}}><SvgIcon d={ICONS.check} size={13}/></button>
+          <button className="act-v3" title="Bloquear" aria-label="Bloquear vaga" onClick={(e)=>{e.stopPropagation();handleAction('block');}}><SvgIcon d={ICONS.shield} size={13}/></button>
+          <button className="act-v3" title="Expirar" aria-label="Marcar como expirada" onClick={(e)=>{e.stopPropagation();handleAction('expire');}}><SvgIcon d={ICONS.clock} size={13}/></button>
+          <button className="act-v3 discard" title="Descartar" aria-label="Descartar vaga" onClick={(e)=>{e.stopPropagation();handleAction('discard');}}><SvgIcon d={ICONS.trash} size={13}/></button>
+          <span className="row-chev"><SvgIcon d={ICONS.chevronDown} size={12}/></span>
         </div>
       </div>
+
+      {expanded && (
+        <div className="job-detail">
+          {job.summary && <p className="sum">{job.summary}</p>}
+          {job.ai_match && (job.ai_match.strengths?.length>0 || job.ai_match.gaps?.length>0) && (
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:18,marginTop:12}}>
+              {job.ai_match.strengths?.length>0 && (
+                <div><h4>Pontos fortes</h4><ul>{job.ai_match.strengths.slice(0,3).map((s,i)=><li key={i}>{s}</li>)}</ul></div>
+              )}
+              {job.ai_match.gaps?.length>0 && (
+                <div><h4>Lacunas</h4><ul>{job.ai_match.gaps.slice(0,2).map((g,i)=><li key={i} className="gap">{g}</li>)}</ul></div>
+              )}
+            </div>
+          )}
+          {job.ai_match && job.ai_match.recommendation && (
+            <p style={{fontSize:11.5,color:'#cbd5e1',marginTop:12,fontStyle:'italic',borderTop:'1px solid rgba(51,65,85,.2)',paddingTop:12}}>{job.ai_match.recommendation}</p>
+          )}
+          {job.archetype && (
+            <p style={{fontSize:11,color:'#64748b',marginTop:8,fontFamily:'var(--font-mono)'}}>Arquétipo: {job.archetype}</p>
+          )}
+          <div style={{marginTop:12}}>
+            <label style={{fontSize:10,fontWeight:600,color:'#64748b',textTransform:'uppercase',letterSpacing:'.08em',display:'block',marginBottom:6,fontFamily:'var(--font-mono)'}}>Notas</label>
+            <textarea rows="2" value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Anotacoes sobre esta vaga…"
+              aria-label="Anotações sobre esta vaga"
+              style={{width:'100%',background:'rgba(255,255,255,.03)',border:'1px solid rgba(51,65,85,.4)',borderRadius:10,padding:10,fontSize:12,color:'#e2e8f0',resize:'none',fontFamily:'var(--font-sans)'}} />
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -1193,64 +1152,81 @@ function App() {
 
   return (
     <ToastProvider>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        {/* Header */}
-        <header className="text-center mb-10 fade-in relative">
-          <div className="inline-flex items-center gap-3 mb-5 px-4 py-1.5 rounded-full"
-            style={{background:'rgba(30,64,175,.06)',border:'1px solid rgba(30,64,175,.12)',backdropFilter:'blur(8px)'}}>
-            <div className="pulse-dot"></div>
-            <span className="text-[10px] text-gray-400 uppercase tracking-[.18em] font-bold font-sans">Pipeline ativo</span>
+      <div className="min-h-screen" style={{background:'#020617'}}>
+        {/* Topbar */}
+        <header className="topbar-v3">
+          <div className="brand-v3">
+            <div className="brand-mark">JH</div>
+            <span>Headhunter Preditivo</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-4 tracking-tight font-sans" style={{"textWrap":"balance"}}>
-            <span className="glow-title">Headhunter</span>
-            <span className="text-white"> Preditivo</span>
-          </h1>
-          <p className="text-sm text-gray-500 max-w-lg mx-auto leading-relaxed font-sans">
-            Pipeline de vagas com IA · Match inteligente · Score automatico · Supabase-first
-          </p>
-          <div className="flex justify-center gap-6 mt-6 text-[11px] text-gray-600 font-medium font-mono">
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" style={{boxShadow:'0 0 6px #10b981'}}></span>
-              Front: v%%DEPLOY_VERSION%% — %%DEPLOY_TIME%%
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent" style={{boxShadow:'0 0 6px #1E40AF'}}></span>
-              DeepSeek v4 Pro
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" style={{boxShadow:'0 0 6px #3B82F6'}}></span>
-              {new Date().toLocaleDateString('pt-BR', {weekday:'short'})} · Pipeline ativo
-            </span>
+          <div className="search-v3">
+            <SvgIcon d={ICONS.search} size={14} style={{color:'#64748b'}}/>
+            <input type="text" placeholder="Buscar cargo ou empresa…" value={searchRaw} onChange={e=>setSearchRaw(e.target.value)} aria-label="Buscar vagas por cargo ou empresa" autoComplete="off" spellCheck="false" />
           </div>
+          <div style={{display:'flex',gap:6,marginLeft:'auto',overflowX:'auto'}}>
+            {[
+              {label:'Todas',status:''},
+              {label:'Favoritas',status:'favorita'},
+              {label:'Inscritas',status:'inscrito'},
+              {label:'Descartadas',status:'descartada'},
+            ].map(p => {
+              const active = p.status ? filters.status===p.status : !filters.status;
+              const n = p.status ? jobs.filter(j=>j._status===p.status).length : jobs.length;
+              return (
+                <button key={p.status} className={`chip-v3 ${active?'active':''}`} onClick={()=>setFilters({...filters,status:p.status})}>
+                  {p.label} <span style={{fontFamily:'var(--font-mono)',fontSize:11}}>{n}</span>
+                </button>
+              );
+            })}
+          </div>
+          <span style={{display:'inline-flex',alignItems:'center',gap:6,fontSize:11,color:'#10b981',fontFamily:'var(--font-mono)',whiteSpace:'nowrap'}}>
+            <span className="pulse-dot"></span>pipeline ativo
+          </span>
         </header>
 
-        <KpiRow jobs={jobs} filteredCount={filtered.length} />
-        <ChartSection jobs={filtered} />
-        <QuickFilters filters={filters} setFilters={setFilters} jobs={jobs} />
-        <FilterBar jobs={filtered} filters={filters} setFilters={setFilters} searchRaw={searchRaw} setSearchRaw={setSearchRaw} visibleCount={filtered.length} />
+        <div className="app-shell">
+          <aside className="sidebar-v3">
+            <Sidebar filters={filters} setFilters={setFilters} jobs={jobs} />
+          </aside>
 
-        {/* Job Cards Grid */}
-        <div className="space-y-4">
-          {filtered.map((job, i) => <JobCard key={job.url || i} job={job} onRemove={removeJob} idx={i} />)}
-        </div>
+          <main className="main-v3">
+            <KpiRow jobs={jobs} filteredCount={filtered.length} />
+            <ChartSection jobs={filtered} />
 
-        {filtered.length===0 && (
-          <div className="text-center py-28">
-            <div className="mb-6 opacity-30 flex justify-center">
-              <SvgIcon d={ICONS.search} size={56} style={{color:'#94a3b8'}}/>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',margin:'4px 0 12px'}}>
+              <h2 style={{fontSize:14,fontWeight:700,color:'#e2e8f0'}}>Vagas com melhor fit</h2>
+              <span style={{fontFamily:'var(--font-mono)',fontSize:11,color:'#64748b'}}>{filtered.length} de {jobs.length} · clique na linha para detalhes</span>
             </div>
-            <p className="text-gray-500 font-medium text-lg font-sans">Nenhuma vaga encontrada</p>
-            <p className="text-xs text-gray-700 mt-1.5 font-sans">Tente ajustar os filtros ou limpar a busca.</p>
-          </div>
-        )}
 
-        {/* Footer */}
-        <footer className="text-center mt-16 py-8 border-t" style={{borderColor:'rgba(51,65,85,.2)'}}>
-          <p className="text-[11px] text-gray-700 font-medium tracking-wide font-mono">
-            Job Hunter V10 · Supabase + DeepSeek + React 18 · Hermes Agent Ecosystem
-          </p>
-          <p className="text-[10px] text-gray-800 mt-1 font-mono">Design System: Financial Dashboard Dark · Blue/Amber · Glassmorphism</p>
-        </footer>
+            <div className="list-wrap">
+              <div className="list-head">
+                <span className="list-head-label">Vaga</span>
+                <span className="list-head-label right">Remuneração</span>
+                <span className="list-head-label">Modelo · Senioridade · Stack</span>
+                <span className="list-head-label">Fit</span>
+                <span className="list-head-label right">Ações</span>
+              </div>
+              {filtered.map((job, i) => <JobRow key={job.url || i} job={job} onRemove={removeJob} idx={i} />)}
+            </div>
+
+            {filtered.length===0 && (
+              <div className="text-center py-28">
+                <div className="mb-6 opacity-30 flex justify-center">
+                  <SvgIcon d={ICONS.search} size={56} style={{color:'#94a3b8'}}/>
+                </div>
+                <p className="text-gray-500 font-medium text-lg font-sans">Nenhuma vaga encontrada</p>
+                <p className="text-xs text-gray-700 mt-1.5 font-sans">Tente ajustar os filtros ou limpar a busca.</p>
+              </div>
+            )}
+
+            <footer className="text-center mt-16 py-8 border-t" style={{borderColor:'rgba(51,65,85,.2)'}}>
+              <p className="text-[11px] text-gray-700 font-medium tracking-wide font-mono">
+                Job Hunter v%%DEPLOY_VERSION%% · %%DEPLOY_TIME%% · Supabase + DeepSeek + React 18
+              </p>
+              <p className="text-[10px] text-gray-800 mt-1 font-mono">Design System: Financial Dashboard Dark · Blue/Amber · List Layout v3</p>
+            </footer>
+          </main>
+        </div>
       </div>
     </ToastProvider>
   );

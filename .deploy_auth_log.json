@@ -22,5 +22,11 @@
     "action": "authorize",
     "old_hash": "f94c22dd55ae713270b31303c4cc4cbb96c793abc935abcff533dac60d6b53fc",
     "new_hash": "b15ce14eea4822e1eb59956f16b5f8888d242db78e4f8ad9a51183a104772f05"
+  },
+  {
+    "timestamp": "2026-08-14T21:08:06.946755+00:00",
+    "action": "authorize",
+    "old_hash": "b15ce14eea4822e1eb59956f16b5f8888d242db78e4f8ad9a51183a104772f05",
+    "new_hash": "ee4087b4a0be6702727a6c34610cce5b8a043f540a5981be0a3180a4326549d0"
   }
 ]
