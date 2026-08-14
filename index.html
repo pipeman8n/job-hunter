@@ -519,7 +519,7 @@ async function fetchJobs() {
   try {
     const { data, error } = await supabase
       .from('vw_jobs_full')
-      .select('id_vaga,url,title,company,score,status,notes,source,location,salary,salary_min,salary_max,work_model,seniority,requirements,stack,summary,ai_match,is_blocked,searched_at')
+      .select('id_vaga,url,title,company,score,status,notes,source,location,salary,salary_min,salary_max,work_model,seniority,requirements,stack,summary,ai_match,is_blocked,searched_at,tech_score,exp_score,cultura_score,alinhamento_score,verdict,archetype,is_live,legitimidade')
       .order('score', { ascending: false, nullsFirst: false });
     if (error) { console.error('Supabase:', error); return []; }
     return (data || [])
@@ -608,9 +608,17 @@ async function fetchJobs() {
         stack: row.stack || [],
         summary: row.summary || '',
         fit_score: row.fit_score || 0,
+        archetype: row.archetype || '',
+        legitimidade: row.legitimidade || '',
+        is_live: row.is_live,
         ai_match: (row.fit_score || row.match_level) ? {
           fit_score: row.fit_score,
           match_level: row.match_level,
+          tech_score: row.tech_score,
+          exp_score: row.exp_score,
+          cultura_score: row.cultura_score,
+          alinhamento_score: row.alinhamento_score,
+          verdict: row.verdict || '',
           strengths: row.strengths || [],
           gaps: row.gaps || [],
           recommendation: row.recommendation || ''
@@ -1012,11 +1020,15 @@ function JobCard({ job, onRemove, idx }) {
         <div className="flex items-start justify-between gap-4 mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1.5">
-              {job.ai_match && <span className="badge badge-ai">AI Match</span>}
+              {job.ai_match && <span className="badge badge-ai">{job.ai_match.verdict || 'AI Match'}</span>}
               {score>=70 ? <span className="badge badge-score-high">{score}%</span>
                 : score>=40 ? <span className="badge badge-score-mid">{score}%</span>
                 : score>0 ? <span className="badge bg-white/[0.04] text-gray-500 border border-white/[0.06] font-mono">{score}%</span>
                 : null}
+              {job.archetype && job.archetype!=='Outros' && <span className="badge bg-purple-500/10 text-purple-300 border border-purple-500/15">{job.archetype}</span>}
+              {job.legitimidade==='Suspicious' && <span className="badge bg-red-500/12 text-red-400 border border-red-500/20">Ghost: suspeita</span>}
+              {job.legitimidade==='Caution' && <span className="badge bg-amber-500/10 text-amber-400 border border-amber-500/15">Ghost: cautela</span>}
+              {job.is_live===false && <span className="badge bg-red-500/12 text-red-400 border border-red-500/20">Link morto</span>}
               {isRemote && <span className="badge badge-remote">Remoto</span>}
               {isHybrid && <span className="badge badge-hybrid">Hibrido</span>}
               {!isRemote && !isHybrid && job.work_model && <span className="badge bg-white/[0.04] text-gray-400 border border-white/[0.06]">{job.work_model}</span>}
@@ -1072,6 +1084,19 @@ function JobCard({ job, onRemove, idx }) {
             {job.ai_match && (
               <div className="rounded-2xl p-5 border"
                 style={{background:'rgba(30,64,175,.04)', borderColor:'rgba(30,64,175,.12)'}}>
+                {(job.ai_match.tech_score!=null || job.ai_match.exp_score!=null || job.ai_match.cultura_score!=null || job.ai_match.alinhamento_score!=null) && (
+                  <div className="space-y-1.5 mb-4">
+                    {[['Tecnico', job.ai_match.tech_score, '#60a5fa'], ['Experiencia', job.ai_match.exp_score, '#34d399'], ['Cultura', job.ai_match.cultura_score, '#fbbf24'], ['Alinhamento', job.ai_match.alinhamento_score, '#c084fc']].map(([label, val, color]) => val!=null && (
+                      <div key={label} className="flex items-center gap-2">
+                        <span className="text-[10px] text-gray-500 w-20 shrink-0 font-sans">{label}</span>
+                        <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+                          <div className="h-full rounded-full" style={{width:`${val}%`, background:color}}></div>
+                        </div>
+                        <span className="text-[10px] text-gray-400 w-7 text-right font-mono">{val}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px]">
                   {job.ai_match.strengths?.length>0 && (
                     <div>
