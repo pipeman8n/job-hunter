@@ -644,6 +644,9 @@ async function fetchJobs() {
         if (/\bsocial\b/i.test(t)) return false;
         if (/\bcustomer\b/i.test(t)) return false;
         if (/desenvolvedor[ae]?\s+(de\s+)?sistemas/i.test(t)) return false;
+        // Auto-fix blacklist 08/15
+        if (/\bt[ée]cnico[as]?\b/i.test(t)) return false;
+        if (/fp&a|fpa\b/i.test(t)) return false;
         return true;
       })
       .map(row => ({
