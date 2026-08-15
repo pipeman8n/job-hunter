@@ -313,10 +313,10 @@ button,a,select,.glass-card,.kpi-card,[role="button"]{cursor:pointer}
 .side-item-v3.active .side-count{color:#93c5fd}
 .main-v3{padding:20px 22px;max-width:1380px}
 .list-wrap{border:1px solid rgba(51,65,85,.25);border-radius:12px;overflow:hidden;background:#0e1626}
-.list-head{display:grid;grid-template-columns:minmax(240px,1.8fr) 96px 1.15fr 150px 1fr;gap:12px;align-items:center;padding:8px 14px;background:rgba(11,17,32,.6);border-bottom:1px solid rgba(51,65,85,.4)}
+.list-head{display:grid;grid-template-columns:minmax(240px,1.8fr) 1.15fr 150px 1fr;gap:12px;align-items:center;padding:8px 14px;background:rgba(11,17,32,.6);border-bottom:1px solid rgba(51,65,85,.4)}
 .list-head-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#64748b;font-family:var(--font-mono)}
 .list-head-label.right{text-align:right}
-.job-row{display:grid;grid-template-columns:minmax(240px,1.8fr) 96px 1.15fr 150px 1fr;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(51,65,85,.2);position:relative;cursor:pointer;transition:background .12s;animation:cardStaggerIn .4s var(--easing) both}
+.job-row{display:grid;grid-template-columns:minmax(240px,1.8fr) 1.15fr 150px 1fr;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(51,65,85,.2);position:relative;cursor:pointer;transition:background .12s;animation:cardStaggerIn .4s var(--easing) both}
 .job-row:last-child{border-bottom:none}
 .job-row:hover{background:rgba(30,64,175,.05)}
 .job-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--row-accent,transparent)}
@@ -746,9 +746,6 @@ function KpiRow({ jobs, filteredCount }) {
     const m = (j.work_model||'').toLowerCase();
     return m.includes('remoto')||m.includes('remote')||m.includes('híbr')||m.includes('hybrid');
   }).length;
-  const salaries = jobs.filter(j=>j.salary_min).map(j=>j.salary_min);
-  const avgSalary = salaries.length ? Math.round(salaries.reduce((a,b)=>a+b,0)/salaries.length) : null;
-  const maxSalary = salaries.length ? Math.max(...salaries) : 0;
   const seniorities = jobs.map(j=>j.seniority).filter(Boolean);
   const topSeniority = [...new Set(seniorities)].slice(0,2).join(' · ') || '—';
   const pendingCount = jobs.filter(j=>(j._status||'pending')==='pending').length;
@@ -756,7 +753,7 @@ function KpiRow({ jobs, filteredCount }) {
   const scoreTarget = 65; // target match score
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-4 mb-10">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4 mb-10">
       <KpiCard idx={0} iconD={ICONS.document} iconBg="rgba(30,64,175,.15)"
         label="Total de Vagas" value={total}
         sub={`${filteredCount} exibidas`}
@@ -770,12 +767,7 @@ function KpiRow({ jobs, filteredCount }) {
         label="Remotas/Hibridas" value={remoteCount}
         sub={`${pctRemote}% do total`} delta={`${pctRemote}%`} trend="up"
         bulletPct={Math.min(pctRemote,100)} bulletTargetPct={50} bulletColor="#3B82F6"/>
-      <KpiCard idx={3} iconD={ICONS.currency} iconBg="rgba(217,119,6,.15)"
-        label="Salario Medio"
-        value={avgSalary?`R$ ${(avgSalary/1000).toFixed(0)}k`:'N/D'}
-        sub={avgSalary?`Ate R$ ${Math.round(maxSalary/1000)}k`:'Sem dados'}
-        bulletPct={avgSalary?Math.min((avgSalary/15000)*100,100):0} bulletTargetPct={60} bulletColor="#D97706"/>
-      <KpiCard idx={4} iconD={ICONS.trending} iconBg="rgba(239,68,68,.15)"
+      <KpiCard idx={3} iconD={ICONS.trending} iconBg="rgba(239,68,68,.15)"
         label="Senioridade Top" value={topSeniority==='—'?'N/D':topSeniority}
         sub={`${pendingCount} pendentes`}
         bulletPct={topSeniority!=='—'?70:10} bulletTargetPct={null} bulletColor="#EF4444"/>
@@ -879,6 +871,7 @@ function ChartSection({ jobs }) {
 // ─── Sidebar (filtros) ──────────────────────────
 function Sidebar({ filters, setFilters, jobs }) {
   const counts = {
+    pending: jobs.filter(j=>j._status==='pending').length,
     favorita: jobs.filter(j=>j._status==='favorita').length,
     inscrito: jobs.filter(j=>j._status==='inscrito').length,
     descartada: jobs.filter(j=>j._status==='descartada').length,
@@ -889,6 +882,7 @@ function Sidebar({ filters, setFilters, jobs }) {
   const models = [...new Set(jobs.map(j=>j.work_model).filter(Boolean))].sort();
 
   const statusItems = [
+    { label:'Pendentes', status:'pending', count:counts.pending },
     { label:'Todas as vagas', status:'', count:counts.todas },
     { label:'Favoritas', status:'favorita', count:counts.favorita },
     { label:'Inscritas', status:'inscrito', count:counts.inscrito },
@@ -935,7 +929,6 @@ function Sidebar({ filters, setFilters, jobs }) {
         aria-label="Ordenar vagas"
         style={{width:'100%',height:34,borderRadius:8,background:'rgba(11,17,32,.8)',border:'1px solid rgba(51,65,85,.25)',color:'#e2e8f0',fontSize:12,padding:'0 10px',fontFamily:'var(--font-sans)',outline:'none',cursor:'pointer'}}>
         <option value="score">Melhor Match</option>
-        <option value="salary">Maior Salário</option>
         <option value="recent">Mais Recentes</option>
       </select>
     </div>
@@ -999,9 +992,6 @@ function JobRow({ job, onRemove, idx }) {
     ['C', job.ai_match && job.ai_match.cultura_score, '#fbbf24'],
     ['A', job.ai_match && job.ai_match.alinhamento_score, '#c084fc'],
   ];
-  let salary = '';
-  if (job.salary) salary = (job.salary.startsWith('R$')||job.salary.startsWith('R$ ')) ? job.salary : `R$ ${job.salary}`;
-  else if (job.salary_min) salary = `R$ ${Math.round(job.salary_min/1000)}k${job.salary_max?`-${Math.round(job.salary_max/1000)}k`:''}`;
   const stack = (job.stack || []).slice(0, 2);
   const stackMore = (job.stack || []).length - 2;
 
@@ -1040,9 +1030,6 @@ function JobRow({ job, onRemove, idx }) {
             {job.company || 'Empresa'}{job.location ? ` · ${job.location}` : ''}
           </div>
         </div>
-
-        {/* Remuneração */}
-        <div style={{fontFamily:'var(--font-mono)',fontSize:13,fontWeight:600,color:'#6ee7b7',textAlign:'right',whiteSpace:'nowrap'}}>{salary || '—'}</div>
 
         {/* Badges */}
         <div style={{display:'flex',gap:5,overflow:'hidden',alignItems:'center'}}>
@@ -1115,7 +1102,7 @@ function JobRow({ job, onRemove, idx }) {
 function App() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ search:'', category:'', model:'', sort:'score', status:'' });
+  const [filters, setFilters] = useState({ search:'', category:'', model:'', sort:'score', status:'pending' });
   const [searchRaw, setSearchRaw] = useState('');
   const debouncedSearch = useDebounce(searchRaw, 300);
 
@@ -1131,12 +1118,10 @@ function App() {
 
   const filtered = useMemo(() => {
     let r = [...jobs];
-    if (!filters.status) r = r.filter(j => (j._status||'pending')!=='descartada' && (j._status||'pending')!=='expirada' && (j._status||'pending')!=='inscrito');
     if (filters.search) { const s = filters.search.toLowerCase(); r = r.filter(j => (j.title||'').toLowerCase().includes(s) || (j.company||'').toLowerCase().includes(s)); }
     if (filters.category) r = r.filter(j => j.query_label === filters.category);
     if (filters.model) r = r.filter(j => j.work_model === filters.model);
     if (filters.status) r = r.filter(j => (j._status||'pending') === filters.status);
-    if (filters.sort==='salary') r.sort((a,b) => (b.salary_min||0)-(a.salary_min||0));
     return r;
   }, [jobs, filters]);
 
@@ -1166,6 +1151,7 @@ function App() {
           </div>
           <div style={{display:'flex',gap:6,marginLeft:'auto',overflowX:'auto'}}>
             {[
+              {label:'Pendentes',status:'pending'},
               {label:'Todas',status:''},
               {label:'Favoritas',status:'favorita'},
               {label:'Inscritas',status:'inscrito'},
@@ -1202,7 +1188,6 @@ function App() {
             <div className="list-wrap">
               <div className="list-head">
                 <span className="list-head-label">Vaga</span>
-                <span className="list-head-label right">Remuneração</span>
                 <span className="list-head-label">Modelo · Senioridade · Stack</span>
                 <span className="list-head-label">Fit</span>
                 <span className="list-head-label right">Ações</span>
