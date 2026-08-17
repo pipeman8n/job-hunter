@@ -311,7 +311,7 @@ button,a,select,.glass-card,.kpi-card,[role="button"]{cursor:pointer}
 .side-item-v3.active{background:rgba(30,64,175,.16);color:#dbeafe;font-weight:600}
 .side-count{font-family:var(--font-mono);font-size:11px;color:#64748b}
 .side-item-v3.active .side-count{color:#93c5fd}
-.main-v3{padding:20px 22px;max-width:1380px}
+.main-v3{padding:20px 22px;max-width:1380px;margin:0 auto}
 .list-wrap{border:1px solid rgba(51,65,85,.25);border-radius:12px;overflow:hidden;background:#0e1626}
 .list-head{display:grid;grid-template-columns:minmax(240px,1.8fr) 1.15fr 150px 1fr;gap:12px;align-items:center;padding:8px 14px;background:rgba(11,17,32,.6);border-bottom:1px solid rgba(51,65,85,.4)}
 .list-head-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#64748b;font-family:var(--font-mono)}
@@ -718,7 +718,7 @@ function KpiCard({ iconD, iconBg, label, value, sub, delta, trend, idx, bulletPc
           </div>
           <div className="text-xs text-gray-400 mt-1 font-medium tracking-wider uppercase font-sans"
             style={{letterSpacing:'.12em'}}>{label}</div>
-          {sub && <div className="text-[10px] text-gray-600 mt-0.5 font-mono">{sub}</div>}
+          {sub && <div className="text-[11px] text-slate-400 mt-0.5 font-mono">{sub}</div>}
         </div>
       </div>
       {/* Bullet chart bar */}
@@ -842,14 +842,14 @@ function ChartSection({ jobs }) {
   }, [categoryData, modelData]);
 
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 gap-5 mb-10 ${categoryData.length <= 1 && modelData.length <= 1 ? 'hidden' : ''}`}>
+    <div className={`grid grid-cols-1 md:grid-cols-2 gap-5 mb-10 ${categoryData.length === 0 && modelData.length === 0 ? 'hidden' : ''}`}>
       <div className="glass-card p-6 fade-in" style={{animationDelay:'.3s'}}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-sm font-semibold text-gray-300 flex items-center gap-2 font-sans" style={{"textWrap":"balance"}}>
             <span className="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_8px_rgba(30,64,175,.5)]"></span>
             <span className="tracking-wider uppercase text-[11px]">Vagas por Categoria</span>
           </h3>
-          <span className="text-[10px] text-gray-600 font-medium font-mono">{categoryData.length} categorias</span>
+          <span className="text-[11px] text-slate-400 font-medium font-mono">{categoryData.length} categorias</span>
         </div>
         <div className="chart-container"><canvas id="chartCategory" role="img" aria-label="Gráfico de barras: vagas por categoria"></canvas></div>
       </div>
@@ -859,7 +859,7 @@ function ChartSection({ jobs }) {
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,.5)]"></span>
             <span className="tracking-wider uppercase text-[11px]">Modelo de Trabalho</span>
           </h3>
-          <span className="text-[10px] text-gray-600 font-medium font-mono">{modelData.length} tipos</span>
+          <span className="text-[11px] text-slate-400 font-medium font-mono">{modelData.length} tipos</span>
         </div>
         <div className="chart-container"><canvas id="chartModel" role="img" aria-label="Gráfico de rosca: vagas por modelo de trabalho"></canvas></div>
       </div>
@@ -1132,7 +1132,7 @@ function App() {
         <SvgIcon d={ICONS.search} size={26} style={{color:'#60a5fa'}}/>
       </div>
       <div className="text-lg text-accent-glow font-bold animate-pulse font-sans">{'Buscando vagas…'}</div>
-      <div className="text-xs text-gray-600 font-mono">Conectando ao Supabase</div>
+      <div className="text-xs text-slate-400 font-mono">Conectando ao Supabase</div>
     </div>
   );
 
@@ -1201,15 +1201,15 @@ function App() {
                   <SvgIcon d={ICONS.search} size={56} style={{color:'#94a3b8'}}/>
                 </div>
                 <p className="text-gray-500 font-medium text-lg font-sans">Nenhuma vaga encontrada</p>
-                <p className="text-xs text-gray-700 mt-1.5 font-sans">Tente ajustar os filtros ou limpar a busca.</p>
+                <p className="text-xs text-slate-400 mt-1.5 font-sans">Tente ajustar os filtros ou limpar a busca.</p>
               </div>
             )}
 
             <footer className="text-center mt-16 py-8 border-t" style={{borderColor:'rgba(51,65,85,.2)'}}>
-              <p className="text-[11px] text-gray-700 font-medium tracking-wide font-mono">
+              <p className="text-xs text-slate-400 font-medium tracking-wide font-mono">
                 Job Hunter v%%DEPLOY_VERSION%% · %%DEPLOY_TIME%% · Supabase + DeepSeek + React 18
               </p>
-              <p className="text-[10px] text-gray-800 mt-1 font-mono">Design System: Financial Dashboard Dark · Blue/Amber · List Layout v3</p>
+              <p className="text-[11px] text-slate-500 mt-1 font-mono">Design System: Financial Dashboard Dark · Blue/Amber · List Layout v3</p>
             </footer>
           </main>
         </div>

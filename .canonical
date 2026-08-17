@@ -3,7 +3,7 @@
 # Any deployment from another session MUST verify against this.
 # Last authorized by: Hermes session default, 2026-08-01
 CANONICAL_VERSION=10
-CANONICAL_HASH=sha256:50d61e6cc059e64143cad8de4942572e747d3c970405198163f04f0abb9af355
+CANONICAL_HASH=sha256:d60d076dd4a66c946dcb404e6f06f4cd79f803dd41f0b736059b1fa97789c3c6
 CANONICAL_PATH=/root/repos/job-hunter-v6/index.html
 DEPLOY_TARGET=/var/lib/docker/volumes/automacoesia-claude_job-hunter_dashboard-html/_data/index.html
 AUTHORIZED_BY=ueberson
