@@ -618,7 +618,7 @@ async function fetchJobs() {
         if (/estoquista|almoxarif|expedi[çc][aã]o/i.test(t)) return false;
         if (/\bmateriais\b|gest[aã]o\s+de\s+materiais/i.test(t)) return false;
         if (/analista\s+fiscal|fiscal\s+(pleno|sr|senior|junior)/i.test(t)) return false;
-        if (/analista\s+cont[aá]bil|cont[aá]bil\b/i.test(t)) return false;
+        if (/analista\s+(de\s+)?cont[aá]bil|cont[aá]bilidade|cont[aá]bil\b/i.test(t)) return false;
         if (/\bcontas\s+a\s+receber\b/i.test(t)) return false;
         if (/\bPCM\b|analista\s+(de\s+)?pcm/i.test(t)) return false;
         const loc = (row.location || '').toLowerCase();
