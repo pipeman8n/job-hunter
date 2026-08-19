@@ -1179,10 +1179,19 @@ function Login() {
 function App() {
   const [session, setSession] = useState(null);
   const [authReady, setAuthReady] = useState(false);
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState(() => {
+    try { const c = JSON.parse(localStorage.getItem('jh_jobs_cache')); if (Array.isArray(c)) return c; } catch (e) {}
+    return [];
+  });
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ search:'', category:'', model:'', sort:'score', status:'pending' });
-  const [searchRaw, setSearchRaw] = useState('');
+  const [filters, setFilters] = useState(() => {
+    try { const f = JSON.parse(localStorage.getItem('jh_filters')); if (f && typeof f === 'object') return { search:'', category:'', model:'', sort:'score', status:'pending', ...f }; } catch (e) {}
+    return { search:'', category:'', model:'', sort:'score', status:'pending' };
+  });
+  const [searchRaw, setSearchRaw] = useState(() => {
+    try { const f = JSON.parse(localStorage.getItem('jh_filters')); if (f && f.search) return f.search; } catch (e) {}
+    return '';
+  });
   const debouncedSearch = useDebounce(searchRaw, 300);
 
   useEffect(() => { setFilters(f => ({...f, search: debouncedSearch})); }, [debouncedSearch]);
@@ -1194,11 +1203,39 @@ function App() {
     return () => { if (sub && sub.subscription) sub.subscription.unsubscribe(); };
   }, []);
 
+  // persiste filtros (sobrevive a reload)
   useEffect(() => {
-    if (!session) return;
-    setLoading(true);
-    fetchJobs().then(j => { setJobs(j); setLoading(false); }).catch(() => setLoading(false));
-  }, [session]);
+    try { localStorage.setItem('jh_filters', JSON.stringify(filters)); } catch (e) {}
+  }, [filters]);
+
+  // Só refaz o fetch quando o estado de login MUDAR (null <-> session). O Supabase
+  // dispara onAuthStateChange com um objeto session NOVO a cada TOKEN_REFRESHED /
+  // INITIAL_SESSION — depender de [session] recarregava a lista e zerava filtro/scroll.
+  const hasSession = !!session;
+  useEffect(() => {
+    if (!hasSession) { setJobs([]); setLoading(false); return; }
+    if (jobs.length > 0) setLoading(false); else setLoading(true);
+    fetchJobs().then(j => {
+      setJobs(j); setLoading(false);
+      try { localStorage.setItem('jh_jobs_cache', JSON.stringify(j)); } catch (e) {}
+    }).catch(() => setLoading(false));
+  }, [hasSession]);
+
+  // salva posição de scroll (sobrevive a reload na mesma aba)
+  useEffect(() => {
+    const save = () => { try { sessionStorage.setItem('jh_scroll', String(window.scrollY)); } catch (e) {} };
+    window.addEventListener('scroll', save, { passive: true });
+    return () => window.removeEventListener('scroll', save);
+  }, []);
+
+  // restaura scroll depois que a lista estabilizou
+  useEffect(() => {
+    if (loading) return;
+    const t = setTimeout(() => {
+      try { const y = parseInt(sessionStorage.getItem('jh_scroll'), 10); if (!isNaN(y) && y > 0) window.scrollTo(0, y); } catch (e) {}
+    }, 60);
+    return () => clearTimeout(t);
+  }, [loading]);
 
   const removeJob = useCallback((url) => {
     setJobs(prev => prev.filter(j => j.url !== url));
