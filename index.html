@@ -439,9 +439,10 @@ async function saveBlockReason(url, title, reason) {
 const API_BASE = '/api';
 async function apiCall(data) {
   try {
+    const token = (await supabase.auth.getSession()).data.session?.access_token || '';
     const res = await fetch(`${API_BASE}/vagas/status`, {
       method: 'PATCH',
-      headers: {'Content-Type':'application/json'},
+      headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${token}`},
       body: JSON.stringify({url: data.url, status: data.status, notas: data.notes || '', timestamp: new Date().toISOString()})
     });
     return res.ok;
