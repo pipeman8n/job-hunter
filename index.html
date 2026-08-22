@@ -663,6 +663,7 @@ async function fetchJobs() {
         if (/\bincidentes\b/i.test(t)) return false;
         if (/\blegal\b/i.test(t)) return false;
         if (/\bcontinuidade\b/i.test(t)) return false;
+        if (/vaga\s+padr[aã]o/i.test(t)) return false;  // auto-fix 08/22: placeholder LinkedIn
         return true;
       })
       .map(row => ({
