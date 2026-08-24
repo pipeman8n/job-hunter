@@ -1140,12 +1140,30 @@ function Login() {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const translateAuthError = (msg) => {
+    const m = (msg || '').toLowerCase();
+    if (m.includes('invalid login credentials')) return 'E-mail ou senha inválidos. Verifique e tente de novo.';
+    if (m.includes('email not confirmed')) return 'E-mail ainda não confirmado. Verifique sua caixa de entrada.';
+    if (m.includes('rate limit') || m.includes('too many')) return 'Muitas tentativas. Aguarde um pouco e tente de novo.';
+    if (m.includes('invalid') || m.includes('credentials')) return 'Dados inválidos. Verifique e tente de novo.';
+    return msg;
+  };
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true); setErr('');
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setBusy(false);
-    if (error) setErr(error.message);
+    if (error) { setErr(translateAuthError(error.message)); setPassword(''); }
+  };
+  const forgotPassword = async () => {
+    const em = email.trim();
+    if (!em) { setErr('Digite seu e-mail para redefinir a senha.'); return; }
+    setBusy(true); setErr('');
+    const { error } = await supabase.auth.resetPasswordForEmail(em, { redirectTo: window.location.origin });
+    setBusy(false);
+    if (error) setErr(translateAuthError(error.message));
+    else setResetSent(true);
   };
   const googleLogin = async () => {
     setGoogleBusy(true); setErr('');
@@ -1184,6 +1202,11 @@ function Login() {
         <button type="button" onClick={googleLogin} disabled={googleBusy}
           style={{background:'#fff',color:'#0f172a',border:'none',borderRadius:8,padding:'11px',fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
           {googleBusy ? 'Redirecionando…' : (<><GoogleG/> Entrar com Google</>)}
+        </button>
+        {resetSent && <div style={{color:'#34d399',fontSize:12,textAlign:'center'}}>E-mail de redefinição enviado. Verifique sua caixa de entrada.</div>}
+        <button type="button" onClick={forgotPassword} disabled={busy}
+          style={{background:'none',border:'none',color:'#64748b',fontSize:12,cursor:'pointer',textDecoration:'underline',padding:0,marginTop:4}}>
+          Esqueci minha senha
         </button>
       </form>
     </div>
