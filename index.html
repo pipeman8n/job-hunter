@@ -670,6 +670,7 @@ async function fetchJobs() {
         if (/\blegal\b/i.test(t)) return false;
         if (/\bcontinuidade\b/i.test(t)) return false;
         if (/vaga\s+padr[aã]o/i.test(t)) return false;  // auto-fix 08/22: placeholder LinkedIn
+        if (/\bmoda\b/i.test(t)) return false;  // auto-fix 08/24: consultor de moda
         return true;
       })
       .map(row => ({
