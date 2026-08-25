@@ -973,7 +973,7 @@ function JobRow({ job, onRemove, idx }) {
       setModal(newStatus);
       return;
     }
-    const target = (newStatus === 'favorita' && status === 'favorita') || (newStatus === 'inscrito' && status === 'inscrito') ? 'pending' : newStatus;
+    const target = (newStatus === 'favorita' && status === 'favorita') ? 'pending' : newStatus;
     await applyStatus(target);
   };
 
@@ -1083,7 +1083,7 @@ function JobRow({ job, onRemove, idx }) {
         {/* Ações */}
         <div className="job-actions-v3">
           <button className="act-v3 fav" title="Favoritar" aria-label="Favoritar vaga" onClick={(e)=>{e.stopPropagation();handleAction('favorita');}}><SvgIcon d={ICONS.star} size={13}/></button>
-          <button className="act-v3 apply" title="Inscrito" aria-label="Marcar como inscrito" onClick={(e)=>{e.stopPropagation();handleAction('inscrito');}}><SvgIcon d={ICONS.check} size={13}/></button>
+          <button className="act-v3 apply" title={status==='inscrito'?'Inscrito ✓':'Marcar como inscrito'} aria-label={status==='inscrito'?'Já inscrito':'Marcar como inscrito'} style={status==='inscrito'?{background:'rgba(34,197,94,.18)',color:'#22c55e'}:{}} onClick={(e)=>{e.stopPropagation();handleAction('inscrito');}}><SvgIcon d={ICONS.check} size={13}/></button>
           <button className="act-v3" title="Bloquear" aria-label="Bloquear vaga" onClick={(e)=>{e.stopPropagation();handleAction('block');}}><SvgIcon d={ICONS.shield} size={13}/></button>
           <button className="act-v3" title="Expirar" aria-label="Marcar como expirada" onClick={(e)=>{e.stopPropagation();handleAction('expire');}}><SvgIcon d={ICONS.clock} size={13}/></button>
           <button className="act-v3 discard" title="Descartar" aria-label="Descartar vaga" onClick={(e)=>{e.stopPropagation();handleAction('discard');}}><SvgIcon d={ICONS.trash} size={13}/></button>
