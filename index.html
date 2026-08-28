@@ -611,6 +611,7 @@ async function fetchJobs() {
         if (/analista.*\bmarketing\b/i.test(t)) return false;
         if (/\bdesign\b|ux|ui\b/i.test(t)) return false;
         if (/coordenador\s+(de\s+)?vendas|inside\s*sales/i.test(t)) return false;
+        if (/business\s*development/i.test(t)) return false;
         if (/\bdevops\b|sre\b|site\s*reliability/i.test(t)) return false;
         if (/data\s*scientist|machine\s*learning/i.test(t)) return false;
         if (/sap\s+(mm|sd|fi|co|pp|pm|hr|abap|basis)/i.test(t)) return false;
