@@ -672,6 +672,7 @@ async function fetchJobs() {
         if (/\bcontinuidade\b/i.test(t)) return false;
         if (/vaga\s+padr[aã]o/i.test(t)) return false;  // auto-fix 08/22: placeholder LinkedIn
         if (/\bmoda\b/i.test(t)) return false;  // auto-fix 08/24: consultor de moda
+        if (/apresentador/i.test(t)) return false;  // auto-fix 08/29: apresentador (lives/conteudo digital)
         if (/consultor[ae]?\s+(de\s+)?loja|vendedor[ae]?\s+(de\s+)?loja/i.test(t)) return false;  // auto-fix 08/28: Consultor/Vendedor de Loja (varejo)
         return true;
       })
