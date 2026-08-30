@@ -655,7 +655,7 @@ async function fetchJobs() {
         if (/analista\s+(de\s+)?sistemas|vibecoding/i.test(t)) return false;
         if (/consultor[ae]?\s+comercial/i.test(t)) return false;
         if (/analista\s+financeir[oa]\b/i.test(t)) return false;
-        if (/im[oó]ve[iî]s|imobili[aá]ri[oa]|corretor\s+(de\s+)?im[oó]vei[sî]|corretor\s+imobili[aá]rio/i.test(t)) return false;
+        if (/im[oó]ve[lîi]s?|imobili[aá]ri[oa]|corretor\s+(de\s+)?im[oó]vei[sî]|corretor\s+imobili[aá]rio/i.test(t)) return false;
         if (/beleza|dermoconsultor|est[ée]tic[ao]/i.test(t)) return false;
         // Auto-fix blacklist 08/13
         if (/\bsocial\b/i.test(t)) return false;
@@ -673,6 +673,7 @@ async function fetchJobs() {
         if (/vaga\s+padr[aã]o/i.test(t)) return false;  // auto-fix 08/22: placeholder LinkedIn
         if (/\bmoda\b/i.test(t)) return false;  // auto-fix 08/24: consultor de moda
         if (/apresentador/i.test(t)) return false;  // auto-fix 08/29: apresentador (lives/conteudo digital)
+        if (/programa[çc][aã]o\s+(de\s+)?rotas/i.test(t)) return false;  // auto-fix 08/30: programação de rotas (logística)
         if (/consultor[ae]?\s+(de\s+)?loja|vendedor[ae]?\s+(de\s+)?loja/i.test(t)) return false;  // auto-fix 08/28: Consultor/Vendedor de Loja (varejo)
         return true;
       })
